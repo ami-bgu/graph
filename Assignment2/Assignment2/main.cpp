@@ -72,7 +72,8 @@ void init(const char* filename)
 		else if (strcmp(type, LIGHT) == 0){
 			//light 1,1,1,0.3,0.2,0.6
 			//OR if spotlight:
-			//light 1,-1,1,0.9,0.1,0.6,0,4,-5.5,30
+			//light 1,-1,1,0.9,0.1,0.6,0,4,-5.5,30
+
 			printf("\nlight");
 
 			fscanf_s(f1, "%f,%f,%f,%f,%f,%f",&light_dir_x, &light_dir_y, &light_dir_z, &light_intensity_R, &light_intensity_G, &light_intensity_B);
