@@ -94,7 +94,6 @@
     <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="old.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="SceneFileParser.cpp" />
     <ClCompile Include="SceneManager.cpp" />
