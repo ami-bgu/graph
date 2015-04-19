@@ -1,10 +1,12 @@
 #pragma once
-#include "SceneObject.h"
+#include "Shape.h"
 class Sphere :
-	public SceneObject
+	public Shape
 {
 public:
-	Sphere();
+
+	Sphere(const Vector3f& center, float radius, const Material& material);
+
 	virtual ~Sphere();
 };
 

@@ -1,10 +1,10 @@
 #pragma once
 #include "SceneObject.h"
-class LightSource :
+class Light :
 	public SceneObject
 {
 public:
-	LightSource();
-	virtual ~LightSource();
+	Light();
+	virtual ~Light();
 };
 
