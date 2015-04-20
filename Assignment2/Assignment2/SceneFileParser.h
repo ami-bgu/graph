@@ -4,6 +4,16 @@
 #include "Plane.h"
 #include "Sphere.h"
 #include "AmbientLight.h"
+#include "DirectionalLight.h"
+#include "SpotLight.h"
+
+
+#include <vector>
+#include <string>
+#include <sstream>
+#include <fstream>
+
+
 
 class SceneFileParser
 {
@@ -12,10 +22,11 @@ public:
 	static void parse(SceneManager& manager, const char* filename);
 
 private:
-	static void parseScene(SceneManager& manager, FILE* f1);
-	static void parseLight(SceneManager& manager, FILE* f1);
-	static void parseSphere(SceneManager& manager, FILE* f1);
-	static void parsePlane(SceneManager& manager, FILE* f1);
+	static Material parseMaterial(SceneManager& manager, vector<string>& vec);
+	static void parseScene(SceneManager& manager, vector<string>& vec);
+	static void parseLight(SceneManager& manager, vector<string>& vec);
+	static void parseSphere(SceneManager& manager, vector<string>& vec);
+	static void parsePlane(SceneManager& manager, vector<string>& vec);
 
 	
 };

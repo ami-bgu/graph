@@ -42,14 +42,12 @@ void ScenePainter::applyImageToTexture()
 	//build texture
 	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.width, resolution.height, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pic);	//original
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.width, resolution.height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, pic);	//best	
-
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, resolution.width, resolution.height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, pic);	//best
 	
 }
 
 void ScenePainter::init()
 {
-	
 	glEnable(GL_TEXTURE_2D);
 	glOrtho(-1.0, 1.0, -1.0, 1.0, 2.0, -2.0);
 	glClearColor(0, 0, 0, 0);
