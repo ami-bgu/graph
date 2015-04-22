@@ -8,6 +8,7 @@ public:
 	virtual ~DirectionalLight();
 	virtual const Vector3f getDirection(const Vector3f& point);
 
+	Rgb& getRgb();
 protected:
 	Vector3f direction;
 

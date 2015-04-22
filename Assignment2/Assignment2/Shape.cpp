@@ -38,9 +38,9 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 		rgb.blue += (tmpNxL >= 0) ? tmpNxL * material.Kd.blue : 0;
 
 		//Vector3f& v = pointOfImpact - Vector3f(0, 0, 0);	//TODO: change 0,0,0 to camera center
-		retVal.red += rgb.red*light->getRgb().red;
-		retVal.green += rgb.green*light->getRgb().green;
-		retVal.blue += rgb.blue*light->getRgb().blue;
+		retVal.red += rgb.red*light->getRgb(pointOfImpact).red;
+		retVal.green += rgb.green*light->getRgb(pointOfImpact).green;
+		retVal.blue += rgb.blue*light->getRgb(pointOfImpact).blue;
 	}
 
 	//1 is max blat

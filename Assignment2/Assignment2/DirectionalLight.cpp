@@ -14,3 +14,8 @@ DirectionalLight::~DirectionalLight()
 const Vector3f DirectionalLight::getDirection(const Vector3f& point){
 	return direction;
 }
+
+Rgb& DirectionalLight::getRgb()
+{
+	return rgb;
+}

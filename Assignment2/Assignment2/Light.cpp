@@ -15,7 +15,7 @@ Light::~Light()
 {
 }
 
-Rgb& Light::getRgb()
+Rgb Light::getRgb(const Vector3f& point)
 {
 	return rgb;
 }

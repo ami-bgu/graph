@@ -7,7 +7,7 @@ public:
 	Light(const Rgb& rgb);
 	Light(const Vector3f& center, const Rgb& rgb);
 	virtual ~Light();
-	Rgb& getRgb();
+	virtual Rgb getRgb(const Vector3f& point);
 	virtual const Vector3f getDirection(const Vector3f& point) = 0;
 
 

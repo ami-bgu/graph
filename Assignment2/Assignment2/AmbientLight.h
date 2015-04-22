@@ -8,5 +8,7 @@ public:
 	virtual ~AmbientLight();
 	virtual const Vector3f getDirection(const Vector3f& point);
 
+	virtual Rgb& getRgb();
+
 };
 

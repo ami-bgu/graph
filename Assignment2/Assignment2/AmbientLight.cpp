@@ -15,3 +15,8 @@ const Vector3f AmbientLight::getDirection(const Vector3f& point){
 	printf("you shouldnt call this ");
 	return Vector3f();
 }
+
+Rgb& AmbientLight::getRgb()
+{
+	return rgb;
+}
