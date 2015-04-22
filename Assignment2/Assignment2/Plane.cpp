@@ -11,6 +11,10 @@ Plane::Plane(const Vector3f& center, const Vector3f& normal, float width, float 
 
 }
 
+Plane::~Plane()
+{
+}
+
 float Plane::getWidth()
 {
 	return width;
@@ -21,6 +25,18 @@ float Plane::getHeight()
 	return height;
 }
 
-Plane::~Plane()
+RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec)
 {
+	RayHitData rhd;
+	//calculate the point of impact in the infinite plane
+	Vector3f& q0 = this->center;
+	const Vector3f& p0 = source;
+	Vector3f p = p0 + vec * Vector3f::dotProduct(this->normal, (q0 - p0) / Vector3f::dotProduct(this->normal, vec));
+	
+	//check if point of impact is in finite plane
+	//TODO: finish this code
+
+
+	rhd.isHit = false;
+	return rhd;
 }

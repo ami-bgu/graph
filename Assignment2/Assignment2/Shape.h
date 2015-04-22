@@ -10,6 +10,8 @@ public:
 
 	virtual ~Shape();
 
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec) = 0;
+
 protected:
 	Material material;
 

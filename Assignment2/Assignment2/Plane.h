@@ -10,6 +10,8 @@ public:
 
 	virtual ~Plane();
 	
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec);
+
 	float getWidth();
 	float getHeight();
 

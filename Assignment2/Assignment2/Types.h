@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "Vector3f.h"
+
 typedef struct Resolution
 {
 	int width;
@@ -22,3 +24,12 @@ typedef struct Material
 	float shininess;
 	bool isMirror;
 } Material;
+
+typedef struct RayHitData
+{
+	Vector3f pointOfHit;
+	Vector3f directionOfNextRay;
+	Rgb intensity;
+	float distance;
+	bool isHit;
+} RayHitData;

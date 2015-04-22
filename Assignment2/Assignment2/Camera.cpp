@@ -6,7 +6,7 @@ Camera::Camera(const Vector3f& center, Plane* imagePlane, const Vector3f& up, co
 SceneObject(center), imagePlane(imagePlane), up(up), res(res), ambient(ambient)
 {
 	this->up.normalize();	//have to be normalized
-	raysToImagePlane = new Vector3f[res.width*res.height];
+//	raysToImagePlane = new Vector3f[res.width*res.height];
 
 }
 
@@ -14,7 +14,7 @@ SceneObject(center), imagePlane(imagePlane), up(up), res(res), ambient(ambient)
 Camera::~Camera()
 {
 	delete imagePlane;
-	delete[] raysToImagePlane;
+	//delete[] raysToImagePlane;
 }
 
 Resolution Camera::getResolution()
@@ -23,7 +23,7 @@ Resolution Camera::getResolution()
 }
 
 //TODO: check if we can optimize with calculating just half
-void Camera::calculateRaysToImagePlane()
+void Camera::calculateRaysToImagePlane(vector<Vector3f>& raysToImagePlane)
 {
 	Vector3f& pc = imagePlane->getCenter();
 	Vector3f towards = pc - this->center;
@@ -41,10 +41,10 @@ void Camera::calculateRaysToImagePlane()
 		{
 			Vector3f p = pc + right*((x - half_rx)*(float)r) - up*((y - half_ry)*(float)r);
 			Vector3f ray = p - this->center;
-			raysToImagePlane[Utils::get1DIndexFrom2D(x, y)] = ray;
+			ray.normalize();
+			raysToImagePlane.push_back(ray);
+			//raysToImagePlane[Utils::get1DIndexFrom2D(x, y)] = ray;
 		}
 	}
-
-
 
 }
