@@ -40,3 +40,8 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 	rhd.isHit = false;
 	return rhd;
 }
+
+Vector3f Plane::getNormal(const Vector3f& point)
+{
+	return normal;
+}

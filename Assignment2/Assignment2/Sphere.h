@@ -13,6 +13,8 @@ public:
 	
 
 protected:
+	virtual Vector3f getNormal(const Vector3f& point);
+
 	float radius;
 };
 

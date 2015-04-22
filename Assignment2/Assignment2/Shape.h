@@ -17,8 +17,10 @@ public:
 
 protected:
 	Material material;
+	virtual Vector3f getNormal(const Vector3f& point) = 0;
+	virtual Rgb calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, std::list<Light*>& lights);
 
-	virtual Rgb calculateIntensity(AmbientLight& ambient, std::list<Light*>& lights);
-
+private:
+	bool isOccluded(const Vector3f& pointOfImpact, const Vector3f& rayDirection, std::vector<Shape*>& shapes);
 };
 

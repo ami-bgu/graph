@@ -16,6 +16,8 @@ public:
 	float getHeight();
 
 protected:
+	virtual Vector3f getNormal(const Vector3f& point);
+
 	Vector3f normal;
 	float width;
 	float height;

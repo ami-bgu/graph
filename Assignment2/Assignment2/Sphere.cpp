@@ -33,9 +33,16 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 		float t = t1 > 0 ? t1 : t2;
 		rhd.pointOfHit = source + vec*t;
 		rhd.distance = t;
-		rhd.intensity = Shape::calculateIntensity(ambient, lights);
+		rhd.intensity = Shape::calculateIntensity(rhd.pointOfHit, ambient, lights);
 		//TODO: fill rhd.directionOfNextRay
 	}
 
 	return rhd;
+}
+
+Vector3f Sphere::getNormal(const Vector3f& point)
+{
+	Vector3f normal = point - center;
+	normal.normalize();
+	return normal;
 }

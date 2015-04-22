@@ -5,6 +5,8 @@
 #include "Vector3f.h"
 #include "Types.h"
 #include <list>
+#include <vector>
+
 
 class SceneObject
 {

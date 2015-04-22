@@ -6,6 +6,7 @@ class DirectionalLight :
 public:
 	DirectionalLight(const Vector3f& direction, const Rgb& rgb);
 	virtual ~DirectionalLight();
+	virtual const Vector3f getDirection(const Vector3f& point);
 
 protected:
 	Vector3f direction;

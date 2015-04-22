@@ -9,3 +9,8 @@ SpotLight::SpotLight(const Vector3f& direction, const Rgb& rgb, const Vector3f& 
 SpotLight::~SpotLight()
 {
 }
+
+const Vector3f SpotLight::getDirection(const Vector3f& point){
+	//todo : implement this
+	return Vector3f();
+}
