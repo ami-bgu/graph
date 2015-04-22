@@ -11,7 +11,7 @@ Sphere::~Sphere()
 {
 }
 
-RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec)
+RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights)
 {
 	RayHitData rhd;
 
@@ -31,10 +31,9 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec)
 		float t1 = tm - th;
 		float t2 = tm + th;
 		float t = t1 > 0 ? t1 : t2;
-		Rgb rgb = { 1.0, 1.0, 1.0 };
 		rhd.pointOfHit = source + vec*t;
 		rhd.distance = t;
-		rhd.intensity = rgb;
+		rhd.intensity = Shape::calculateIntensity(ambient, lights);
 		//TODO: fill rhd.directionOfNextRay
 	}
 

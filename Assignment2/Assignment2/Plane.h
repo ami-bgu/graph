@@ -10,7 +10,7 @@ public:
 
 	virtual ~Plane();
 	
-	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec);
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights);
 
 	float getWidth();
 	float getHeight();
@@ -19,5 +19,6 @@ protected:
 	Vector3f normal;
 	float width;
 	float height;
+
 };
 

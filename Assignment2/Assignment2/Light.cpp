@@ -14,3 +14,8 @@ Light::Light(const Vector3f& center, const Rgb& rgb) : SceneObject(center), rgb(
 Light::~Light()
 {
 }
+
+Rgb& Light::getRgb()
+{
+	return rgb;
+}

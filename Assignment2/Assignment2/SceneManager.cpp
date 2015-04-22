@@ -58,7 +58,7 @@ void SceneManager::render(GLubyte* image)
 			for (std::list<Shape*>::iterator it_shape = _shapes.begin(); it_shape != _shapes.end(); ++it_shape)
 			{
 				Shape* shape = *it_shape;
-				RayHitData rhd = shape->getRayHitResult(_camera->getCenter(), raysToImagePlane[y*res.width+x]);
+				RayHitData rhd = shape->getRayHitResult(_camera->getCenter(), raysToImagePlane[y*res.width+x], _camera->getAmbientLight(), _lights);
 				if (rhd.isHit){
 					found = true;
 					if (min_distance == -1 || rhd.distance < min_distance){

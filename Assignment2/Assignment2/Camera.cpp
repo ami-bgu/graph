@@ -17,9 +17,14 @@ Camera::~Camera()
 	//delete[] raysToImagePlane;
 }
 
-Resolution Camera::getResolution()
+Resolution& Camera::getResolution()
 {
 	return res;
+}
+
+AmbientLight& Camera::getAmbientLight()
+{
+	return ambient;
 }
 
 //TODO: check if we can optimize with calculating just half

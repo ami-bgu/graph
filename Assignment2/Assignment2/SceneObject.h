@@ -4,6 +4,7 @@
 #include <math.h>
 #include "Vector3f.h"
 #include "Types.h"
+#include <list>
 
 class SceneObject
 {

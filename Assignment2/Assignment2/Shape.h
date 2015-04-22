@@ -1,5 +1,8 @@
 #pragma once
 #include "SceneObject.h"
+#include "AmbientLight.h"
+#include "SpotLight.h"
+#include "DirectionalLight.h"
 
 class Shape :
 	public SceneObject
@@ -10,10 +13,12 @@ public:
 
 	virtual ~Shape();
 
-	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec) = 0;
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights) = 0;
 
 protected:
 	Material material;
+
+	virtual Rgb calculateIntensity(AmbientLight& ambient, std::list<Light*>& lights);
 
 };
 
