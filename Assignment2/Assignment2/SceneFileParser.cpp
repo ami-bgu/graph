@@ -33,9 +33,9 @@ void SceneFileParser::parseScene(SceneManager& manager, vector<string>& vec)
 	Plane* imagePlane = new Plane(imagePlaneCenter, normal, width, height);
 
 	//Camera(const Vector3f& center, const Plane& imagePlane, const Vector3f& up, int resolutionX, int resolutionY, const float* rgb);
-	Rgb ambient = { ambient_light_R, ambient_light_G, ambient_light_B };
+	Rgb ambient_rgb = { ambient_light_R, ambient_light_G, ambient_light_B };
 	Resolution res = { screen_x, screen_y };
-	Camera* camera = new Camera(cameraPos, imagePlane, Vector3f(UPx, UPy, UPz), res, ambient);
+	Camera* camera = new Camera(cameraPos, imagePlane, Vector3f(UPx, UPy, UPz), res, AmbientLight(ambient_rgb));
 
 	manager.init(camera);
 }
@@ -53,7 +53,7 @@ void SceneFileParser::parseLight(SceneManager& manager, vector<string>& vec)
 	printf("\nlight");
 	printf("\n\tDirection\t(%.1f,%.1f,%.1f) \n\tIntensity:\t(%.1f,%.1f,%.1f)",
 		light_dir_x, light_dir_y, light_dir_z, light_intensity_R, light_intensity_G, light_intensity_B);
-
+	Rgb rgb = { light_intensity_R, light_intensity_G, light_intensity_B };
 	if (vec.size() > 7)	//spot light
 	{
 		float spot_x = stof(vec[7]);
@@ -61,11 +61,11 @@ void SceneFileParser::parseLight(SceneManager& manager, vector<string>& vec)
 		float spot_z = stof(vec[9]);
 		float cutoff_angle = stof(vec[10]);
 		printf("\n\tSpotlight pos:\t(%.2f,%.2f,%.2f) \n\tCutoff Angle:\t%.2f\n", spot_x, spot_y, spot_z, cutoff_angle);
-		light = new SpotLight();	//TODO: fill constructors
+		light = new SpotLight(Vector3f(light_dir_x,light_dir_y,light_dir_z),rgb,Vector3f(spot_x,spot_y,spot_z),cutoff_angle);	//TODO: fill constructors
 	}
 	else //directional light
 	{
-		light = new DirectionalLight(); //TODO: fill constructors
+		light = new DirectionalLight(Vector3f(light_dir_x, light_dir_y, light_dir_z), rgb); //TODO: fill constructors
 	}
 	manager.addSceneLight(light);
 }

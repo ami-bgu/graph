@@ -5,10 +5,12 @@ class Shape :
 	public SceneObject
 {
 public:
-	Shape();
+	Shape(const Vector3f& center, const Material& material);
+	Shape(const Vector3f& center);
+
 	virtual ~Shape();
 
-private:
+protected:
 	Material material;
 
 };

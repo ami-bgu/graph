@@ -10,6 +10,10 @@ Utils::~Utils()
 {
 }
 
+int Utils::width;
+int Utils::height;
+
+
 void Utils::reverseArray(char* arr, int size)
 {
 	char temp;
@@ -33,4 +37,15 @@ void Utils::splitString(const string& str, vector<string>& output){
 		}
 	}
 	output.push_back(tmp);
+}
+
+int Utils::get1DIndexFrom2D(int x, int y)
+{
+	return Utils::width*y + x;
+}
+
+void Utils::set2DArraySizes(int width, int height)
+{
+	Utils::width = width;
+	Utils::height = height;
 }

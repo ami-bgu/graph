@@ -23,6 +23,7 @@ SceneManager::~SceneManager()
 	delete _camera;
 }
 
+/*
 void SceneManager::render(GLubyte* image)
 {
 	Resolution& res = _camera->getResolution();
@@ -38,7 +39,12 @@ void SceneManager::render(GLubyte* image)
 	
 	Utils::reverseArray((char*)image, size);
 }
+*/
 
+void SceneManager::render(GLubyte* image)
+{
+	_camera->calculateRaysToImagePlane();
+}
 void SceneManager::init(Camera* camera)
 {
 	if (!_camera)

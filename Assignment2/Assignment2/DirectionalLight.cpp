@@ -1,7 +1,7 @@
 #include "DirectionalLight.h"
 
 
-DirectionalLight::DirectionalLight()
+DirectionalLight::DirectionalLight(const Vector3f& direction, const Rgb& rgb) :Light(rgb), direction(direction)
 {
 }
 

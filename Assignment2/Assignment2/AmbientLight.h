@@ -4,7 +4,7 @@ class AmbientLight :
 	public Light
 {
 public:
-	AmbientLight(const float(&rgb)[3]);
+	AmbientLight(const Rgb& rgb);
 	virtual ~AmbientLight();
 };
 

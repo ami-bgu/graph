@@ -8,11 +8,11 @@
 class SceneObject
 {
 public:
-	SceneObject();
+	SceneObject(const Vector3f& center);
 	virtual ~SceneObject();
+	Vector3f& getCenter();
 
-
-private:
+protected:
 	Vector3f center;
 };
 

@@ -12,6 +12,13 @@ public:
 
 	static void reverseArray(char* arr, int size);
 	static void splitString(const string& str, vector<string>& output);
+	
+	static int get1DIndexFrom2D(int x, int y);
+	static void set2DArraySizes(int width, int height);
+
+private:
+	static int width;
+	static int height;
 
 };
 
