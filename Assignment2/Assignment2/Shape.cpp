@@ -31,7 +31,7 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 	{
 		Light* light = *it;
 		Vector3f normal = getNormal(pointOfImpact);
-		const Vector3f& li = light->getDirection(pointOfImpact);
+		const Vector3f& li = light->getDirection(pointOfImpact)*-1; //show ariel
 		float tmpNxL = Vector3f::dotProduct(normal, li);
 		rgb.red += (tmpNxL >= 0) ? tmpNxL * material.Kd.red : 0;
 		rgb.green += (tmpNxL >= 0) ? tmpNxL * material.Kd.green : 0;

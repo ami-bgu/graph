@@ -19,16 +19,20 @@ Rgb SpotLight::getRgb(const Vector3f& point)
 {
 	Vector3f L = point-this->center;
 	Vector3f& D = direction;
+	Rgb retVal = { 0, 0, 0 };
 
 	float Kc = 0;
 	float Kl = 1;
-	float Kq = 1;
+	float Kq = 0.1;
 
 	float dot = Vector3f::dotProduct(D, L);
+	float angleBetween = acosf( dot / (D.getLength()*L.getLength()) );
+	if (abs(angleBetween) > this->angle/180){
+		return retVal;
+	}
 	float d = L.getLength();
 	float d2 = pow(d,2);
 
-	Rgb retVal;
 	retVal.red = (rgb.red * dot) / (Kc + Kl*d + Kq*d2);
 	retVal.green = (rgb.green * dot) / (Kc + Kl*d + Kq*d2);
 	retVal.blue = (rgb.blue * dot) / (Kc + Kl*d + Kq*d2);

@@ -173,6 +173,9 @@ void SceneFileParser::parse(SceneManager& manager, const char* filename)
 	std::string line;
 	while (std::getline(file, line))
 	{
+		if (line.length() == 0)	continue;
+		if (line.length() >= 2 && line.compare(0,2,"//")==0)	continue;
+
 		vector<string> vec;
 		Utils::splitString(line, vec);
 		if (vec.empty())	continue;
