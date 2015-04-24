@@ -25,7 +25,7 @@ float Plane::getHeight()
 	return height;
 }
 
-RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights)
+RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
 {
 	RayHitData rhd;
 	//calculate the point of impact in the infinite plane
@@ -46,8 +46,8 @@ Vector3f Plane::getNormal(const Vector3f& point)
 	return normal;
 }
 
-bool Plane::doesRayHit(const Vector3f& source, const Vector3f& vec)
+float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 {
 	//TODO: implement
-	return false;
+	return -1;
 }

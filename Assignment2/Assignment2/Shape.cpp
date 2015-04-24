@@ -14,7 +14,7 @@ Shape::~Shape()
 {
 }
 
-Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, std::list<Light*>& lights)
+Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
 {
 	//add ie
 
@@ -34,13 +34,25 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 
 		//check if occluded
 		bool isOccluded = false;
+		/*
 		//for each shape check
-
+		for (std::list<Shape*>::iterator s_it = shapes.begin(); s_it != shapes.end(); ++s_it){
+			Shape* shape = *s_it;
+			if (shape == this) continue; //skip if its the same shape
+			float shapeDistanceFromLight = light->getDirection() - ;
+			float myDistanceFromLight;
+			if (shapeDistanceFromLight == -1) continue; //shape is not in the way
+			
+			if (shape->doesRayHit(pointOfImpact, light->getDirection() )){
+				isOccluded = true;
+				break;
+			}
+		}*/
 		if (isOccluded) continue;
 
 		//diffuse
 		Vector3f& normal = getNormal(pointOfImpact);
-		const Vector3f& li = light->getDirection(pointOfImpact)*-1; //show ariel
+		const Vector3f& li = light->getDirection(pointOfImpact)*(-1);
 		float tmpNxL = Vector3f::dotProduct(normal, li);
 		if (tmpNxL<=0) continue;
 		rgb.red		+= tmpNxL * material.Kd.red;

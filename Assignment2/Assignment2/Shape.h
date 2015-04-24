@@ -4,6 +4,7 @@
 #include "SpotLight.h"
 #include "DirectionalLight.h"
 
+
 class Shape :
 	public SceneObject
 {
@@ -13,13 +14,13 @@ public:
 
 	virtual ~Shape();
 
-	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights) = 0;
-	virtual bool doesRayHit(const Vector3f& source, const Vector3f& vec) = 0;
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes) = 0;
+	virtual float rayHitDistance(const Vector3f& source, const Vector3f& vec) = 0;
 
 protected:
 	Material material;
 	virtual Vector3f getNormal(const Vector3f& point) = 0;
-	virtual Rgb calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, std::list<Light*>& lights);
+	virtual Rgb calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes);
 
 
 private:

@@ -19,3 +19,4 @@ Rgb& DirectionalLight::getRgb()
 {
 	return rgb;
 }
+

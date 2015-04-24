@@ -11,7 +11,7 @@ Sphere::~Sphere()
 {
 }
 
-RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights)
+RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
 {
 	RayHitData rhd;
 
@@ -33,7 +33,7 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 		float t = t1 > 0 ? t1 : t2;
 		rhd.pointOfHit = source + vec*t;
 		rhd.distance = t;
-		rhd.intensity = Shape::calculateIntensity(rhd.pointOfHit, ambient, lights);
+		rhd.intensity = Shape::calculateIntensity(rhd.pointOfHit, ambient, lights, shapes);
 		//TODO: fill rhd.directionOfNextRay
 	}
 
@@ -47,11 +47,24 @@ Vector3f Sphere::getNormal(const Vector3f& point)
 	return normal;
 }
 
-bool Sphere::doesRayHit(const Vector3f& source, const Vector3f& vec)
+float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 {
+	float retDistance;
 	Vector3f l = this->center - source;
 	float tm = Vector3f::dotProduct(l, vec);
 	float dsqr = Vector3f::dotProduct(l, l) - (tm*tm);
 	float rsqr = this->radius * this->radius;
-	return (dsqr <= rsqr);
+	if (dsqr > rsqr)
+	{
+		retDistance = -1;
+	}
+	else
+	{
+		float th = sqrt(rsqr - dsqr);
+		float t1 = tm - th;
+		float t2 = tm + th;
+		float t = t1 > 0 ? t1 : t2;
+
+		return t;
+	}
 }

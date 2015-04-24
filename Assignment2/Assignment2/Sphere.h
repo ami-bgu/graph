@@ -8,9 +8,9 @@ public:
 	Sphere(const Vector3f& center, float radius, const Material& material);
 	virtual ~Sphere();
 
-	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights);
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes);
 
-	virtual bool doesRayHit(const Vector3f& source, const Vector3f& vec);
+	virtual float rayHitDistance(const Vector3f& source, const Vector3f& vec);
 
 	
 

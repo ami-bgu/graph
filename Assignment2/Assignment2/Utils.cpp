@@ -49,3 +49,4 @@ void Utils::set2DArraySizes(int width, int height)
 	Utils::width = width;
 	Utils::height = height;
 }
+
