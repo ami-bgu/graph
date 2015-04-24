@@ -44,7 +44,7 @@ void Camera::calculateRaysToImagePlane(vector<Vector3f>& raysToImagePlane)
 	{
 		for (int x = 0; x < res.width; x++)
 		{
-			Vector3f p = pc + right*((x - half_rx)*(float)r) - up*((y - half_ry)*(float)r);
+			Vector3f p = pc + right*((x - half_rx)*(float)r) + up*((y - half_ry)*(float)r);
 			Vector3f ray = p - this->center;
 			ray.normalize();
 			raysToImagePlane.push_back(ray);
