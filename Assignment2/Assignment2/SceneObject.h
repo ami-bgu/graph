@@ -14,8 +14,13 @@ public:
 	SceneObject(const Vector3f& center);
 	virtual ~SceneObject();
 	Vector3f& getCenter();
-
+	int getId();
 protected:
 	Vector3f center;
+
+private:
+	int id;
+	static int lastId;
+
 };
 

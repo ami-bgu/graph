@@ -32,6 +32,12 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 	{
 		Light* light = *it;
 
+		//check if occluded
+		bool isOccluded = false;
+		//for each shape check
+
+		if (isOccluded) continue;
+
 		//diffuse
 		Vector3f& normal = getNormal(pointOfImpact);
 		const Vector3f& li = light->getDirection(pointOfImpact)*-1; //show ariel

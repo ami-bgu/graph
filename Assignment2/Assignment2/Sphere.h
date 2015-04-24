@@ -10,6 +10,8 @@ public:
 
 	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, std::list<Light*>& lights);
 
+	virtual bool doesRayHit(const Vector3f& source, const Vector3f& vec);
+
 	
 
 protected:

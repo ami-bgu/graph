@@ -45,3 +45,9 @@ Vector3f Plane::getNormal(const Vector3f& point)
 {
 	return normal;
 }
+
+bool Plane::doesRayHit(const Vector3f& source, const Vector3f& vec)
+{
+	//TODO: implement
+	return false;
+}

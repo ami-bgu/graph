@@ -46,3 +46,12 @@ Vector3f Sphere::getNormal(const Vector3f& point)
 	normal.normalize();
 	return normal;
 }
+
+bool Sphere::doesRayHit(const Vector3f& source, const Vector3f& vec)
+{
+	Vector3f l = this->center - source;
+	float tm = Vector3f::dotProduct(l, vec);
+	float dsqr = Vector3f::dotProduct(l, l) - (tm*tm);
+	float rsqr = this->radius * this->radius;
+	return (dsqr <= rsqr);
+}
