@@ -25,7 +25,7 @@ float Plane::getHeight()
 	return height;
 }
 
-RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
+RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes, int recursiveLevel)
 {
 	RayHitData rhd;
 	//calculate the point of impact in the infinite plane

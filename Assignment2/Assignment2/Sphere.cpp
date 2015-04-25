@@ -11,7 +11,7 @@ Sphere::~Sphere()
 {
 }
 
-RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
+RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes, int recursiveLevel)
 {
 	RayHitData rhd;
 
@@ -35,6 +35,13 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 		rhd.distance = t;
 		rhd.intensity = Shape::calculateIntensity(rhd.pointOfHit, ambient, lights, shapes);
 		//TODO: fill rhd.directionOfNextRay
+		/*
+		Vector3f normalToImpact = rhd.pointOfHit - this->center;
+		normalToImpact.normalize();
+		Vector3f hittingRay = vec;
+		hittingRay.normalize();
+		Vector3f& r = (-1)*hittingRay + (normalToImpact*(2.0*Vector3f::dotProduct(hittingRay, normalToImpact)));
+		*/
 	}
 
 	return rhd;

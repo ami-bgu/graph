@@ -14,7 +14,7 @@ public:
 
 	virtual ~Shape();
 
-	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes) = 0;
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes, int recursiveLevel) = 0;
 	virtual float rayHitDistance(const Vector3f& source, const Vector3f& vec) = 0;
 
 protected:

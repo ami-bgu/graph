@@ -10,7 +10,7 @@ public:
 
 	virtual ~Plane();
 	
-	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes);
+	virtual RayHitData getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes, int recursiveLevel);
 	virtual float rayHitDistance(const Vector3f& source, const Vector3f& vec);
 
 	float getWidth();
