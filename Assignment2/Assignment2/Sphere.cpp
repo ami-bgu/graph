@@ -47,8 +47,10 @@ Vector3f Sphere::getNormal(const Vector3f& point)
 	return normal;
 }
 
-float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec)
+float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec1)
 {
+	Vector3f vec = vec1;
+	vec.normalize();
 	float retDistance;
 	Vector3f l = this->center - source;
 	float tm = Vector3f::dotProduct(l, vec);
@@ -62,12 +64,12 @@ float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 	else
 	{
 		float th = sqrt(rsqr - dsqr);
-		//float t1 = tm - th;
-		//float t2 = tm + th;
-		//float t = t1 > 0 ? t1 : t2;
+		float t1 = tm - th;
+		float t2 = tm + th;
+		float t = t1 > 0 ? t1 : t2;
 
-		//return t;
-		return (tm - th); //todo: why this?
+		return t;
+		//return (tm + th); //todo: why this?
 	}
 }
 
