@@ -3,12 +3,12 @@
 
 Plane::Plane(const Vector3f& center, const Vector3f& normal, float width, float height, const Material& material) :Shape(center, material), normal(normal), width(width), height(height)
 {
-
+	calculateCorners();
 }
 
 Plane::Plane(const Vector3f& center, const Vector3f& normal, float width, float height) : Shape(center), normal(normal), width(width), height(height)
 {
-
+	calculateCorners();
 }
 
 Plane::~Plane()
@@ -50,4 +50,11 @@ float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 {
 	//TODO: implement
 	return -1;
+}
+
+void Plane::calculateCorners()
+{
+	Vector3f horizontalDirection;
+	Vector3f verticalDirection;
+	normal.getTwoOrthogonals(horizontalDirection, verticalDirection);
 }

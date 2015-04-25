@@ -22,6 +22,8 @@ protected:
 	Vector3f normal;
 	float width;
 	float height;
-
+	Vector3f corners[4];
+	void calculateCorners();
+	
 };
 
