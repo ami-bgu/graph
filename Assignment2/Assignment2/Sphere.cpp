@@ -56,15 +56,19 @@ float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 	float rsqr = this->radius * this->radius;
 	if (dsqr > rsqr)
 	{
-		retDistance = -1;
+		//retDistance = -1;
+		return 0;
 	}
 	else
 	{
 		float th = sqrt(rsqr - dsqr);
-		float t1 = tm - th;
-		float t2 = tm + th;
-		float t = t1 > 0 ? t1 : t2;
+		//float t1 = tm - th;
+		//float t2 = tm + th;
+		//float t = t1 > 0 ? t1 : t2;
 
-		return t;
+		//return t;
+		return (tm - th); //todo: why this?
 	}
 }
+
+

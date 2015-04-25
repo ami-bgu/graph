@@ -8,6 +8,7 @@ public:
 	virtual ~SpotLight();
 	virtual const Vector3f getDirection(const Vector3f& point);
 	virtual Rgb getRgb(const Vector3f& point);
+	virtual bool doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape);
 
 protected:
 	Vector3f direction;

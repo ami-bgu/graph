@@ -12,7 +12,7 @@ public:
 
 	virtual float rayHitDistance(const Vector3f& source, const Vector3f& vec);
 
-	
+
 
 protected:
 	virtual Vector3f getNormal(const Vector3f& point);

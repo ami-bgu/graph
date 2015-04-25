@@ -34,20 +34,18 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 
 		//check if occluded
 		bool isOccluded = false;
-		/*
+		
 		//for each shape check
 		for (std::list<Shape*>::iterator s_it = shapes.begin(); s_it != shapes.end(); ++s_it){
 			Shape* shape = *s_it;
 			if (shape == this) continue; //skip if its the same shape
-			float shapeDistanceFromLight = light->getDirection() - ;
-			float myDistanceFromLight;
-			if (shapeDistanceFromLight == -1) continue; //shape is not in the way
 			
-			if (shape->doesRayHit(pointOfImpact, light->getDirection() )){
+			if (light->doesShapeDropShadowOnPoint(pointOfImpact,shape)){
 				isOccluded = true;
 				break;
 			}
-		}*/
+			
+		}
 		if (isOccluded) continue;
 
 		//diffuse

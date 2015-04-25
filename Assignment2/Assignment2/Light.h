@@ -1,6 +1,8 @@
 #pragma once
 #include "SceneObject.h"
 
+class Shape;
+
 class Light :
 	public SceneObject
 {
@@ -10,6 +12,9 @@ public:
 	virtual ~Light();
 	virtual Rgb getRgb(const Vector3f& point);
 	virtual const Vector3f getDirection(const Vector3f& point) = 0;
+
+	virtual bool doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape)  = 0;
+
 protected:
 	Rgb rgb;
 	Vector3f direction;

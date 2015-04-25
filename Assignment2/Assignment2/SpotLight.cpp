@@ -1,5 +1,5 @@
 #include "SpotLight.h"
-
+#include "Shape.h"
 
 SpotLight::SpotLight(const Vector3f& direction, const Rgb& rgb, const Vector3f& center, float angle) :Light(center, rgb), direction(direction), angle(angle)
 {
@@ -41,4 +41,16 @@ Rgb SpotLight::getRgb(const Vector3f& point)
 	retVal.green	= (retVal.green > 1) ? 1 : retVal.green;
 	retVal.blue		= (retVal.blue  > 1) ? 1 : retVal.blue;
 	return retVal;
+}
+
+bool SpotLight::doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape){
+	Vector3f rayFromPointToLight = this->center - point;
+	float distance = shape->rayHitDistance(point, rayFromPointToLight);
+	
+	if (distance <= 0) return false;
+
+	if (distance > rayFromPointToLight.getLength()){
+		return false;
+	}
+	return true;
 }
