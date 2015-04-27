@@ -38,7 +38,11 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 	Vector3f p = p0 + (vec * Vector3f::dotProduct(this->normal, (q0 - p0) / Vector3f::dotProduct(this->normal, vec)));
 	//todo: check what happen if the plane is parallel 
 
+	bool isOnWhite = isPointOnWhiteSquare(p);
 
+	if (isOnWhite){
+		rhd.intensity = { 0.05, 0.05, 0.05 };
+	}
 	
 	int arr[8] = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
@@ -59,7 +63,17 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 	rhd.pointOfHit = p;
 	rhd.distance = (p - p0).getLength();
 	rhd.intensity = Shape::calculateIntensity(p, vec, ambient, lights, shapes);
+	
+	if (isOnWhite){
+		float newBlue = rhd.intensity.blue + 0.05;
+		float newGreen = rhd.intensity.green + 0.05;
+		float newRed = rhd.intensity.red + 0.05;
 
+		rhd.intensity.blue = (newBlue > 1 ? 1 : newBlue);
+		rhd.intensity.green = (newGreen > 1 ? 1 : newGreen);
+		rhd.intensity.red = (newRed > 1 ? 1 : newRed);
+
+	}
 	return rhd;
 }
 
@@ -124,4 +138,22 @@ void Plane::calculateCorners()
 	corners[1] = center + ( (horizontalDirection*(-1)) + verticalDirection);
 	corners[2] = center + ((horizontalDirection*(-1)) + (verticalDirection*(-1)));
 	corners[3] = center + (horizontalDirection + (verticalDirection*(-1)) );
+}
+
+#define SQUARE_SIZE 0.2
+
+bool Plane::isPointOnWhiteSquare(const Vector3f& point)
+{
+	Vector3f directionA = corners[0] - corners[1];
+	Vector3f directionB = corners[1] - corners[2];
+	directionA.normalize();
+	directionB.normalize();
+	Vector3f& cornerToPoint = point - corners[0];
+	float widthToPoint = Vector3f::dotProduct(cornerToPoint, directionA);
+	float heightToPoint = Vector3f::dotProduct(cornerToPoint, directionB);
+
+	int pointCol = widthToPoint / SQUARE_SIZE;
+	int pointRow = heightToPoint / SQUARE_SIZE;
+
+	return ((pointCol + pointRow) % 2) == 0;
 }

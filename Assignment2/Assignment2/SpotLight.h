@@ -10,6 +10,8 @@ public:
 	virtual Rgb getRgb(const Vector3f& point);
 	virtual bool doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape);
 
+	virtual bool doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& vectorFromPrevObject);
+
 protected:
 	Vector3f direction;
 	float angle;

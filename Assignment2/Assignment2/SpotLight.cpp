@@ -55,3 +55,9 @@ bool SpotLight::doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape){
 	}
 	return true;
 }
+
+bool SpotLight::doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& vectorFromPrevObject)
+{
+	Vector3f& vecFromObjectToLight = pointOfImpact - this->center;
+	return Vector3f::dotProduct(vecFromObjectToLight, vectorFromPrevObject) < 0;
+}

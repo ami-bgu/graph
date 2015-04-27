@@ -25,5 +25,7 @@ protected:
 	Vector3f corners[4];
 	void calculateCorners();
 	
+private:
+	bool isPointOnWhiteSquare(const Vector3f& point);
 };
 
