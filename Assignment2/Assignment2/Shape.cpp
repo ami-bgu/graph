@@ -14,7 +14,7 @@ Shape::~Shape()
 {
 }
 
-Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
+Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, const Vector3f& incomingRay, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes)
 {
 	//add ie
 
@@ -31,7 +31,7 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 	for (std::list<Light*>::iterator it = lights.begin(); it != lights.end(); ++it)
 	{
 		Light* light = *it;
-
+		if (light->doesLightComeInTheRightSide(pointOfImpact, incomingRay))	continue;
 		//check if occluded
 		bool isOccluded = false;
 		

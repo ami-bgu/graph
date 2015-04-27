@@ -58,7 +58,7 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 	rhd.isHit = true;
 	rhd.pointOfHit = p;
 	rhd.distance = (p - p0).getLength();
-	rhd.intensity = Shape::calculateIntensity(p, ambient, lights, shapes);
+	rhd.intensity = Shape::calculateIntensity(p, vec, ambient, lights, shapes);
 
 	return rhd;
 }
