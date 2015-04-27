@@ -47,7 +47,7 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 	return rhd;
 }
 
-Vector3f Sphere::getNormal(const Vector3f& point)
+Vector3f Sphere::getNormal(const Vector3f& point, const Vector3f& incomingVector)
 {
 	Vector3f normal = point - center;
 	normal.normalize();

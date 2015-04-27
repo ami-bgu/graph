@@ -19,7 +19,7 @@ public:
 
 protected:
 	Material material;
-	virtual Vector3f getNormal(const Vector3f& point) = 0;
+	virtual Vector3f getNormal(const Vector3f& point, const Vector3f& incomingVector) = 0;
 	virtual Rgb calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes);
 
 

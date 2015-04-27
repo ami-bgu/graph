@@ -49,8 +49,8 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, AmbientLight& ambie
 		if (isOccluded) continue;
 
 		//diffuse
-		Vector3f& normal = getNormal(pointOfImpact);
 		const Vector3f& li = light->getDirection(pointOfImpact)*(-1);
+		Vector3f& normal = getNormal(pointOfImpact, li);
 		float tmpNxL = Vector3f::dotProduct(normal, li);
 		if (tmpNxL<=0) continue;
 		rgb.red		+= tmpNxL * material.Kd.red;

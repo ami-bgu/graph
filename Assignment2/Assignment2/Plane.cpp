@@ -3,11 +3,13 @@
 
 Plane::Plane(const Vector3f& center, const Vector3f& normal, float width, float height, const Material& material) :Shape(center, material), normal(normal), width(width), height(height)
 {
+	this->normal.normalize();
 	calculateCorners();
 }
 
 Plane::Plane(const Vector3f& center, const Vector3f& normal, float width, float height) : Shape(center), normal(normal), width(width), height(height)
 {
+	this->normal.normalize();
 	calculateCorners();
 }
 
@@ -31,6 +33,8 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 	//calculate the point of impact in the infinite plane
 	Vector3f& q0 = this->center;
 	const Vector3f& p0 = source;
+	this->getNormal(source, vec*(-1));	//to flip normal if needed
+
 	Vector3f p = p0 + (vec * Vector3f::dotProduct(this->normal, (q0 - p0) / Vector3f::dotProduct(this->normal, vec)));
 	//todo: check what happen if the plane is parallel 
 
@@ -59,9 +63,10 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 	return rhd;
 }
 
-Vector3f Plane::getNormal(const Vector3f& point)
+Vector3f Plane::getNormal(const Vector3f& point, const Vector3f& incomingVector)
 {
-	return normal;
+	if (Vector3f::dotProduct(normal, incomingVector) < 0)	this->normal *= -1;
+	return this->normal;
 }
 
 float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
@@ -71,16 +76,25 @@ float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 	//calculate the point of impact in the infinite plane
 	Vector3f& q0 = this->center;
 	const Vector3f& p0 = source;
+
+	int factor = 1;
+	if (Vector3f::dotProduct(vec, this->normal) >= 0)	factor = -1;
+
+	this->getNormal(source, vec *-1);	//to flip normal if needed
 	Vector3f p = p0 + vec * Vector3f::dotProduct(this->normal, (q0 - p0) / Vector3f::dotProduct(this->normal, vec));
 	//todo: check what happen if the plane is parallel 
 
 	rhd.isHit = false;
 	int arr[8] = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
+
 	for (int i = 0; i < 8; i += 2){
 		Vector3f V1 = corners[arr[i]] - source;
 		Vector3f V2 = corners[arr[i + 1]] - source;
 		Vector3f triangleNormal = Vector3f::crossProduct(V1, V2);
+		
+		triangleNormal = triangleNormal * factor;
+
 		triangleNormal.normalize();
 		if (Vector3f::dotProduct(p - p0, triangleNormal) < 0){
 			rhd.isHit = false;
@@ -89,7 +103,7 @@ float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 
 	}
 
-	if (!rhd.isHit) return 0;
+	//if (!rhd.isHit) return 0;
 
 	rhd.distance = (p - p0).getLength();
 
