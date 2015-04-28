@@ -9,7 +9,7 @@ public:
 	virtual const Vector3f getDirection(const Vector3f& point);
 	virtual bool doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape);
 
-	virtual bool doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& vectorFromPrevObject);
+	virtual bool doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& normal);
 
 
 	Rgb& getRgb();

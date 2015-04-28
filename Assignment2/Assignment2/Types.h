@@ -9,12 +9,15 @@ typedef struct Resolution
 	int height;
 } Resolution;
 
+/*
 typedef struct Rgb
 {
 	float red;
 	float green;
 	float blue;
 } Rgb;
+*/
+typedef Vector3f Rgb;
 
 typedef struct Material
 {

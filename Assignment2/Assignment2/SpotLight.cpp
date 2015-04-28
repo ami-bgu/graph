@@ -34,13 +34,13 @@ Rgb SpotLight::getRgb(const Vector3f& point)
 	}
 	float d2 = pow(d,2);
 
-	retVal.red		= (rgb.red   * dot) / (Kc + Kl*d + Kq*d2);
-	retVal.green	= (rgb.green * dot) / (Kc + Kl*d + Kq*d2);
-	retVal.blue		= (rgb.blue  * dot) / (Kc + Kl*d + Kq*d2);
+	retVal.x		= (rgb.x   * dot) / (Kc + Kl*d + Kq*d2);
+	retVal.y		= (rgb.y * dot) / (Kc + Kl*d + Kq*d2);
+	retVal.z		= (rgb.z  * dot) / (Kc + Kl*d + Kq*d2);
 
-	retVal.red		= (retVal.red   > 1) ? 1 : retVal.red;
-	retVal.green	= (retVal.green > 1) ? 1 : retVal.green;
-	retVal.blue		= (retVal.blue  > 1) ? 1 : retVal.blue;
+	retVal.x		= (retVal.x   > 1) ? 1 : retVal.x;
+	retVal.y		= (retVal.y > 1) ? 1 : retVal.y;
+	retVal.z		= (retVal.z  > 1) ? 1 : retVal.z;
 	return retVal;
 }
 
@@ -56,8 +56,8 @@ bool SpotLight::doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape){
 	return true;
 }
 
-bool SpotLight::doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& vectorFromPrevObject)
+bool SpotLight::doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& normal)
 {
 	Vector3f& vecFromObjectToLight = pointOfImpact - this->center;
-	return Vector3f::dotProduct(vecFromObjectToLight, vectorFromPrevObject) < 0;
+	return Vector3f::dotProduct(vecFromObjectToLight, normal) >= 0;
 }

@@ -29,7 +29,8 @@ bool DirectionalLight::doesShapeDropShadowOnPoint(const Vector3f& point, Shape* 
 	return true;
 }
 
-bool DirectionalLight::doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& vectorFromPrevObject)
+bool DirectionalLight::doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& normal)
 {
-	return Vector3f::dotProduct(direction, vectorFromPrevObject) < 0;
+	//above the shapes' surface is true
+	return Vector3f::dotProduct(direction*(-1), normal) >= 0;
 }

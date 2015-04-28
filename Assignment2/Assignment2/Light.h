@@ -15,7 +15,7 @@ public:
 
 	virtual bool doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape)  = 0;
 
-	virtual inline bool doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& vectorFromPrevObject){ return true; }
+	virtual inline bool doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& normal){ return true; }
 
 protected:
 	Rgb rgb;

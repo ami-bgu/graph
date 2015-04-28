@@ -56,7 +56,8 @@ void SceneManager::render(GLubyte* image)
 	for (int y = 0; y < res.height; y++)
 	{
 		for (int x = 0; x < res.width; x++){
-			float min_distance = -1;
+			float min_distance = 0;
+			RayHitData closestRayHit;
 			bool found = false;
 			for (std::list<Shape*>::iterator it_shape = _shapes.begin(); it_shape != _shapes.end(); ++it_shape)
 			{
@@ -64,19 +65,20 @@ void SceneManager::render(GLubyte* image)
 				RayHitData rhd = shape->getRayHitResult(_camera->getCenter(), raysToImagePlane[y*res.width + x], _camera->getAmbientLight(), _lights, _shapes, REFLECT_LEVEL);
 				if (rhd.isHit){
 					found = true;
-					if (min_distance == -1 || rhd.distance < min_distance){
+					if (min_distance == 0 || (rhd.distance>0 && rhd.distance < min_distance)){
 						min_distance = rhd.distance;
-						
-
-						image[y*res.width*3 + (x*3) + 0] = (GLubyte)(int)(rhd.intensity.blue * 255); //B
-						image[y*res.width*3 + (x*3) + 1] = (GLubyte)(int)(rhd.intensity.green * 255); //G
-						image[y*res.width*3 + (x*3) + 2] = (GLubyte)(int)(rhd.intensity.red * 255); //R
-
-						//printf("(%d,%d,%d) \n", image[y*res.width + x + 0], image[y*res.width + x + 1], image[y*res.width + x + 2]);
+						closestRayHit = rhd;
 					}
 				}
 			}
-			if (!found){
+			if (found)
+			{
+				image[y*res.width * 3 + (x * 3) + 0] = (GLubyte)(closestRayHit.intensity.z * 255); //B
+				image[y*res.width * 3 + (x * 3) + 1] = (GLubyte)(closestRayHit.intensity.y * 255); //G
+				image[y*res.width * 3 + (x * 3) + 2] = (GLubyte)(closestRayHit.intensity.x * 255); //R
+			}
+			else
+			{
 				image[y*res.width * 3 + (x * 3) + 0] = (GLubyte)0; //B
 				image[y*res.width * 3 + (x * 3) + 1] = (GLubyte)0; //G
 				image[y*res.width * 3 + (x * 3) + 2] = (GLubyte)0; //R
@@ -85,7 +87,7 @@ void SceneManager::render(GLubyte* image)
 
 		}
 	}
-	printf("counter is : %d\n", counter);
+	//printf("counter is : %d\n", counter);
 }
 
 void SceneManager::init(Camera* camera)

@@ -29,50 +29,71 @@ float Plane::getHeight()
 
 RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes, int recursiveLevel)
 {
+	if ((vec - Vector3f(0,0,-1)).getLength() < 0.05)
+	{
+		int x = 5;
+	}
 	RayHitData rhd;
 	//calculate the point of impact in the infinite plane
 	Vector3f& q0 = this->center;
 	const Vector3f& p0 = source;
+
 	this->getNormal(source, vec*(-1));	//to flip normal if needed
 
+	float divider = Vector3f::dotProduct(this->normal, vec);
+	if (divider == 0)
+	{
+		rhd.isHit = false;
+		return rhd;
+	}
 	Vector3f p = p0 + (vec * Vector3f::dotProduct(this->normal, (q0 - p0) / Vector3f::dotProduct(this->normal, vec)));
 	//todo: check what happen if the plane is parallel 
 
 	bool isOnWhite = isPointOnWhiteSquare(p);
-
-	if (isOnWhite){
-		rhd.intensity = { 0.05, 0.05, 0.05 };
-	}
 	
 	int arr[8] = { 0, 1, 1, 2, 2, 3, 3, 0 };
+
+	int x=0;
 
 	for (int i = 0; i < 8; i+=2){
 		Vector3f V1 = corners[arr[i]] - source;
 		Vector3f V2 = corners[arr[i + 1]] - source;
 		Vector3f triangleNormal = Vector3f::crossProduct(V1, V2);
-		triangleNormal.normalize();
+
 		if (Vector3f::dotProduct(p - p0, triangleNormal) < 0){
-			rhd.isHit = false;
-			return rhd;
+			x++;
 		}
 		
+	}
+	if (x>0 && x<4)
+	{
+		rhd.isHit = false;
+		return rhd;
 	}
 	
 	//rhd.
 	rhd.isHit = true;
 	rhd.pointOfHit = p;
 	rhd.distance = (p - p0).getLength();
+	if (Vector3f::dotProduct(p - p0, vec) < 0)	rhd.distance *= -1;
+	if (rhd.distance <= 0)	//target is in the wrong side
+	{
+		rhd.isHit = false;
+		return rhd;
+	}
+
 	rhd.intensity = Shape::calculateIntensity(p, vec, ambient, lights, shapes);
 	
 	if (isOnWhite){
-		float newBlue = rhd.intensity.blue + 0.05;
-		float newGreen = rhd.intensity.green + 0.05;
-		float newRed = rhd.intensity.red + 0.05;
+		float newBlue = rhd.intensity.z + 0.05;
+		float newGreen = rhd.intensity.y + 0.05;
+		float newRed = rhd.intensity.x + 0.05;
 
-		rhd.intensity.blue = (newBlue > 1 ? 1 : newBlue);
-		rhd.intensity.green = (newGreen > 1 ? 1 : newGreen);
-		rhd.intensity.red = (newRed > 1 ? 1 : newRed);
+		rhd.intensity.z = (newBlue > 1 ? 1 : newBlue);
+		rhd.intensity.y = (newGreen > 1 ? 1 : newGreen);
+		rhd.intensity.x = (newRed > 1 ? 1 : newRed);
 
+		//rhd.intensity = { 1, 1, 1 };
 	}
 	return rhd;
 }
@@ -91,9 +112,6 @@ float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 	Vector3f& q0 = this->center;
 	const Vector3f& p0 = source;
 
-	int factor = 1;
-	if (Vector3f::dotProduct(vec, this->normal) >= 0)	factor = -1;
-
 	this->getNormal(source, vec *-1);	//to flip normal if needed
 	Vector3f p = p0 + vec * Vector3f::dotProduct(this->normal, (q0 - p0) / Vector3f::dotProduct(this->normal, vec));
 	//todo: check what happen if the plane is parallel 
@@ -101,25 +119,29 @@ float Plane::rayHitDistance(const Vector3f& source, const Vector3f& vec)
 	rhd.isHit = false;
 	int arr[8] = { 0, 1, 1, 2, 2, 3, 3, 0 };
 
+	int x = 0;
 
 	for (int i = 0; i < 8; i += 2){
 		Vector3f V1 = corners[arr[i]] - source;
 		Vector3f V2 = corners[arr[i + 1]] - source;
 		Vector3f triangleNormal = Vector3f::crossProduct(V1, V2);
 		
-		triangleNormal = triangleNormal * factor;
-
 		triangleNormal.normalize();
 		if (Vector3f::dotProduct(p - p0, triangleNormal) < 0){
-			rhd.isHit = false;
-			return 0;
+			x++;
 		}
 
+	}
+	if (x>0 && x<4)
+	{
+		rhd.isHit = false;
+		return 0;
 	}
 
 	//if (!rhd.isHit) return 0;
 
 	rhd.distance = (p - p0).getLength();
+	if (Vector3f::dotProduct(p - p0, vec) < 0)	rhd.distance *= -1;
 
 	return rhd.distance;
 }
@@ -140,7 +162,7 @@ void Plane::calculateCorners()
 	corners[3] = center + (horizontalDirection + (verticalDirection*(-1)) );
 }
 
-#define SQUARE_SIZE 0.2
+#define SQUARE_SIZE 1
 
 bool Plane::isPointOnWhiteSquare(const Vector3f& point)
 {

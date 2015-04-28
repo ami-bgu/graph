@@ -13,6 +13,11 @@ Sphere::~Sphere()
 
 RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, AmbientLight& ambient, list<Light*>& lights, list<Shape*>& shapes, int recursiveLevel)
 {
+	if ((vec - Vector3f(0, 0, -1)).getLength() < 0.05)
+	{
+		int x = 5;
+	}
+
 	RayHitData rhd;
 
 	Vector3f l = this->center - source;
@@ -31,8 +36,23 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 		float t1 = tm - th;
 		float t2 = tm + th;
 		float t = t1 > 0 ? t1 : t2;
-		rhd.pointOfHit = source + vec*t;
+
 		rhd.distance = t;
+
+		if (rhd.distance <= 0)	//target is in the wrong side
+		{
+			rhd.isHit = false;
+			return rhd;
+		}
+
+
+		rhd.pointOfHit = source + vec*t;
+
+		if (rhd.pointOfHit.y > 0)
+		{
+			int ggg = 5;
+		}
+
 		rhd.intensity = Shape::calculateIntensity(rhd.pointOfHit, vec, ambient, lights, shapes);
 		//TODO: fill rhd.directionOfNextRay
 		/*
