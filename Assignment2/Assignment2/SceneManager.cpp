@@ -51,7 +51,47 @@ Vector3f calculateImagePlaneMapping(float thetha, float phi)
 						cos(thetha)				);
 }
 
-#define REFLECT_LEVEL 3
+
+RayHitData SceneManager::rayHit(const Vector3f& source, const Vector3f& vec, Shape* lastShape, int recursionLevel)
+{
+	RayHitData closestRayHit;
+	if (recursionLevel > 0)
+	{
+		float min_distance = 0;
+		bool found = false;
+
+		//get ray hit data of closest shape
+		for (std::list<Shape*>::iterator it_shape = _shapes.begin(); it_shape != _shapes.end(); ++it_shape)
+		{
+			Shape* shape = *it_shape;
+			if (lastShape == shape)	continue;
+			RayHitData rhd = shape->getRayHitResult(source, vec, _camera->getAmbientLight(), _lights, _shapes, recursionLevel);
+			if (rhd.isHit){
+				found = true;
+				if (min_distance == 0 || (rhd.distance > 0 && rhd.distance < min_distance)){
+					min_distance = rhd.distance;
+					closestRayHit = rhd;
+				}
+			}
+		}
+		//recursion
+		if (recursionLevel > 1 && closestRayHit.isHit && closestRayHit.shape->getMaterial().isMirror)
+		{
+			RayHitData nextHit = rayHit(closestRayHit.pointOfHit, closestRayHit.directionOfNextRay, closestRayHit.shape, recursionLevel - 1);
+			if (nextHit.isHit)
+			{
+				//closestRayHit.intensity += (nextHit.intensity * MIRROR_KR);
+				//closestRayHit.intensity.x = (closestRayHit.intensity.x    > 1) ? 1 : closestRayHit.intensity.x;
+				//closestRayHit.intensity.y = (closestRayHit.intensity.y  > 1) ? 1 : closestRayHit.intensity.y;
+				//closestRayHit.intensity.z = (closestRayHit.intensity.z   > 1) ? 1 : closestRayHit.intensity.z;
+				closestRayHit.intensity = nextHit.intensity;
+			}
+		}
+	}
+	return closestRayHit;
+}
+
+
 
 void SceneManager::render(GLubyte* image)
 {
@@ -65,22 +105,9 @@ void SceneManager::render(GLubyte* image)
 	for (int y = 0; y < res.height; y++)
 	{
 		for (int x = 0; x < res.width; x++){
-			float min_distance = 0;
-			RayHitData closestRayHit;
-			bool found = false;
-			for (std::list<Shape*>::iterator it_shape = _shapes.begin(); it_shape != _shapes.end(); ++it_shape)
-			{
-				Shape* shape = *it_shape;
-				RayHitData rhd = shape->getRayHitResult(_camera->getCenter(), raysToImagePlane[y*res.width + x], _camera->getAmbientLight(), _lights, _shapes, REFLECT_LEVEL);
-				if (rhd.isHit){
-					found = true;
-					if (min_distance == 0 || (rhd.distance>0 && rhd.distance < min_distance)){
-						min_distance = rhd.distance;
-						closestRayHit = rhd;
-					}
-				}
-			}
-			if (found)
+			RayHitData closestRayHit = rayHit(_camera->getCenter(), raysToImagePlane[y*res.width + x], 0, REFLECT_LEVEL);
+
+			if (closestRayHit.isHit)
 			{
 				image[y*res.width * 3 + (x * 3) + 0] = (GLubyte)(closestRayHit.intensity.z * 255); //B
 				image[y*res.width * 3 + (x * 3) + 1] = (GLubyte)(closestRayHit.intensity.y * 255); //G
@@ -92,7 +119,7 @@ void SceneManager::render(GLubyte* image)
 				image[y*res.width * 3 + (x * 3) + 1] = (GLubyte)0; //G
 				image[y*res.width * 3 + (x * 3) + 2] = (GLubyte)0; //R
 			}
-			counter++;
+			counter++;	//for debug
 
 		}
 	}

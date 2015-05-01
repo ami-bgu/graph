@@ -43,25 +43,23 @@ void SceneFileParser::parseScene(SceneManager& manager, vector<string>& vec)
 void SceneFileParser::parseLight(SceneManager& manager, vector<string>& vec)
 {
 	//for light formatting
-	bool isSpotLight = (vec.size() > 7);
-	int rgbOffset = 0;
-	if (isSpotLight)	rgbOffset = 3;
+
 	Light* light = NULL;
 	float light_dir_x = stof(vec[1]);
 	float light_dir_y = stof(vec[2]);
 	float light_dir_z = stof(vec[3]);
-	float light_intensity_R = stof(vec[4 + rgbOffset]);
-	float light_intensity_G = stof(vec[5 + rgbOffset]);
-	float light_intensity_B = stof(vec[6 + rgbOffset]);
+	float light_intensity_R = stof(vec[4]);
+	float light_intensity_G = stof(vec[5]);
+	float light_intensity_B = stof(vec[6]);
 	printf("\nlight");
 	printf("\n\tDirection\t(%.1f,%.1f,%.1f) \n\tIntensity:\t(%.1f,%.1f,%.1f)",
 		light_dir_x, light_dir_y, light_dir_z, light_intensity_R, light_intensity_G, light_intensity_B);
 	Rgb rgb = { light_intensity_R, light_intensity_G, light_intensity_B };
-	if (isSpotLight)	//spot light
+	if (vec.size() > 7)	//spot light
 	{
-		float spot_x = stof(vec[4]);
-		float spot_y = stof(vec[5]);
-		float spot_z = stof(vec[6]);
+		float spot_x = stof(vec[7]);
+		float spot_y = stof(vec[8]);
+		float spot_z = stof(vec[9]);
 		float cutoff_angle = stof(vec[10]);
 		printf("\n\tSpotlight pos:\t(%.2f,%.2f,%.2f) \n\tCutoff Angle:\t%.2f\n", spot_x, spot_y, spot_z, cutoff_angle);
 		light = new SpotLight(Vector3f(light_dir_x,light_dir_y,light_dir_z),rgb,Vector3f(spot_x,spot_y,spot_z),cutoff_angle);	//TODO: fill constructors
