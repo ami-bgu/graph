@@ -42,6 +42,15 @@ void SceneManager::render(GLubyte* image)
 
 */
 
+//thetha is aperture/2
+//phi is between 0 to 2PI
+Vector3f calculateImagePlaneMapping(float thetha, float phi)
+{
+	return Vector3f(	sin(thetha)*cos(phi),
+						sin(thetha)*sin(phi),
+						cos(thetha)				);
+}
+
 #define REFLECT_LEVEL 3
 
 void SceneManager::render(GLubyte* image)
