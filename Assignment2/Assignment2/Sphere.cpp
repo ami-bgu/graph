@@ -69,7 +69,6 @@ float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec1)
 {
 	Vector3f vec = vec1;
 	vec.normalize();
-	float retDistance;
 	Vector3f l = this->center - source;
 	float tm = Vector3f::dotProduct(l, vec);
 	float dsqr = Vector3f::dotProduct(l, l) - (tm*tm);

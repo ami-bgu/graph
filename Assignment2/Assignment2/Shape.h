@@ -26,7 +26,6 @@ protected:
 
 	virtual Vector3f getReflectedRay(const Vector3f& pointOfImpact, const Vector3f& incomingRay);
 
-private:
-	bool isOccluded(const Vector3f& pointOfImpact, const Vector3f& rayDirection, std::vector<Shape*>& shapes);
+
 };
 

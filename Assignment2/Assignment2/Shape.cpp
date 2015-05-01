@@ -21,12 +21,14 @@ Rgb Shape::calculateIntensity(const Vector3f& pointOfImpact, const Vector3f& inc
 		int x = 5;
 	}
 
-	Rgb retVal;
+	Rgb retVal(0,0,0);
 
 	//ambient light
-	Rgb ia = ambient.getRgb();
-	retVal = ia * material.Ka;
-	
+	if (!material.isTransparent)
+	{
+		Rgb ia = ambient.getRgb();
+		retVal = ia * material.Ka;
+	}
 	
 	//TODO: add occlusion & shadows
 	//diffuse + specular

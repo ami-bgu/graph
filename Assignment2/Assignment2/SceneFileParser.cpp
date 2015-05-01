@@ -87,16 +87,35 @@ Material SceneFileParser::parseMaterial(SceneManager& manager, vector<string>& v
 	float Ks_B = stof(vec[9]);
 
 	float shininess = stof(vec[10]);
-	char M = ' ';
-	if (vec.size() > 11) M = vec[11].at(0);
+
+	bool M = false;	//mirror
+	bool T = false; //transparent
+	bool L = false; //lens
+
+	for (size_t i = 11; i < vec.size(); i++)
+	{
+		char c = vec[i].at(0);
+		switch (c)
+		{
+		case 'M':
+			M = true;
+			break;
+		case 'T':
+			T = true;
+			break;
+		case 'L':
+			L = true;
+			break;
+		}
+	}
 
 
-	printf("\tMaterial:\tKa:\t(%.2f,%.2f,%.2f)\n\t\t\tKd:\t(%.2f,%.2f,%.2f)\n\t\t\tKs:\t(%.2f,%.2f,%.2f)\n\t\t\tShininess:\t%.2f\n\t\t\tSpecial:%c\n", Ka_R, Ka_G, Ka_B, Kd_R, Kd_G, Kd_B, Ks_R, Ks_G, Ks_B, shininess, M);
+	printf("\tMaterial:\tKa:\t(%.2f,%.2f,%.2f)\n\t\t\tKd:\t(%.2f,%.2f,%.2f)\n\t\t\tKs:\t(%.2f,%.2f,%.2f)\n\t\t\tShininess:\t%.2f\n\t\t\tSpecial:M-%d,T-%d,L-%d\n", Ka_R, Ka_G, Ka_B, Kd_R, Kd_G, Kd_B, Ks_R, Ks_G, Ks_B, shininess, M, T,L);
 	
 	Rgb ka_rgb = { Ka_R, Ka_G, Ka_B };
 	Rgb kd_rgb = { Kd_R, Kd_G, Kd_B };
 	Rgb ks_rgb = { Ks_R, Ks_G, Ks_B };
-	Material material = { ka_rgb, kd_rgb, ks_rgb, shininess, M=='M' };
+	Material material = { ka_rgb, kd_rgb, ks_rgb, shininess, M,T,L };
 	return material;
 
 }
@@ -149,7 +168,16 @@ void SceneFileParser::parsePlane(SceneManager& manager, vector<string>& vec)
 	vec.erase(vec.begin(), vec.begin() + 8);
 
 	Material& material = SceneFileParser::parseMaterial(manager, vec);
-	Plane* plane = new Plane(Vector3f(plane_center_x, plane_center_y, plane_center_z), Vector3f(plane_normal_x, plane_normal_y, plane_normal_z), plane_width, plane_height, material);
+	Plane* plane;
+	if (material.isLens)
+	{
+		plane = new LensPlane(Vector3f(plane_center_x, plane_center_y, plane_center_z), Vector3f(plane_normal_x, plane_normal_y, plane_normal_z), plane_width, plane_height, material);
+	}
+	else
+	{
+		plane = new Plane(Vector3f(plane_center_x, plane_center_y, plane_center_z), Vector3f(plane_normal_x, plane_normal_y, plane_normal_z), plane_width, plane_height, material);
+
+	}
 
 	manager.addSceneShape(plane);
 	

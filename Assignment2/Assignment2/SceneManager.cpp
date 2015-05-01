@@ -75,19 +75,34 @@ RayHitData SceneManager::rayHit(const Vector3f& source, const Vector3f& vec, Sha
 			}
 		}
 		//recursion
-		if (recursionLevel > 1 && closestRayHit.isHit && closestRayHit.shape->getMaterial().isMirror)
+		if (closestRayHit.isHit)
 		{
-			RayHitData nextHit = rayHit(closestRayHit.pointOfHit, closestRayHit.directionOfNextRay, closestRayHit.shape, recursionLevel - 1);
-			if (nextHit.isHit)
+			if (closestRayHit.shape->getMaterial().isLens)
 			{
-				//closestRayHit.intensity += (nextHit.intensity * MIRROR_KR);
-				//closestRayHit.intensity.x = (closestRayHit.intensity.x    > 1) ? 1 : closestRayHit.intensity.x;
-				//closestRayHit.intensity.y = (closestRayHit.intensity.y  > 1) ? 1 : closestRayHit.intensity.y;
-				//closestRayHit.intensity.z = (closestRayHit.intensity.z   > 1) ? 1 : closestRayHit.intensity.z;
-				closestRayHit.intensity = nextHit.intensity;
+				closestRayHit = rayHit(closestRayHit.pointOfHit, closestRayHit.directionOfNextRay, closestRayHit.shape, recursionLevel);
 			}
+			else
+			{
+				if (closestRayHit.shape->getMaterial().isTransparent)
+				{
+					RayHitData data2 = rayHit(closestRayHit.pointOfHit, vec, closestRayHit.shape, recursionLevel);
+					if (data2.isHit)	closestRayHit.intensity += (data2.intensity * TRANSPERACY_ALPHA);
+				}
+				if (recursionLevel > 1 && closestRayHit.shape->getMaterial().isMirror)
+				{
+					RayHitData nextHit = rayHit(closestRayHit.pointOfHit, closestRayHit.directionOfNextRay, closestRayHit.shape, recursionLevel - 1);
+					if (nextHit.isHit)
+					{
+						closestRayHit.intensity += (nextHit.intensity * MIRROR_KR);
+					}
+				}
+			}
+
 		}
 	}
+	closestRayHit.intensity.x = (closestRayHit.intensity.x    > 1) ? 1 : closestRayHit.intensity.x;
+	closestRayHit.intensity.y = (closestRayHit.intensity.y  > 1) ? 1 : closestRayHit.intensity.y;
+	closestRayHit.intensity.z = (closestRayHit.intensity.z   > 1) ? 1 : closestRayHit.intensity.z;
 	return closestRayHit;
 }
 

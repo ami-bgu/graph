@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SceneManager.h"
-#include "Plane.h"
+#include "LensPlane.h"
 #include "Sphere.h"
 #include "AmbientLight.h"
 #include "DirectionalLight.h"

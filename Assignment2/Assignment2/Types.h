@@ -4,8 +4,9 @@
 #include "Vector3f.h"
 
 
-#define REFLECT_LEVEL 4
+#define REFLECT_LEVEL 5
 #define MIRROR_KR 0.5f
+#define TRANSPERACY_ALPHA 0.5f
 
 
 
@@ -27,6 +28,8 @@ typedef struct Material
 	Rgb Ks;
 	float shininess;
 	bool isMirror;
+	bool isTransparent;
+	bool isLens;
 } Material;
 
 typedef struct RayHitData
