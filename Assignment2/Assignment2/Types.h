@@ -4,7 +4,7 @@
 #include "Vector3f.h"
 
 
-#define REFLECT_LEVEL 5
+#define REFLECT_LEVEL 6
 #define MIRROR_KR 0.5f
 #define TRANSPERACY_ALPHA 0.5f
 
