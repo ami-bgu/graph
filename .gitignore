@@ -1,6 +1,9 @@
 *.pdb
 *.suo
 *.sdf
-/Assignment2/Debug
 /Assignment2/Assignment2/assignment
+/Assignment2/Debug
 /Assignment2/Assignment2/Debug
+/Graphics3/Debug
+/Graphics3/Graphics3/Debug
+*.user
