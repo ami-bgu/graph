@@ -19,6 +19,7 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 	}
 
 	RayHitData rhd;
+	rhd.shape = this;
 
 	Vector3f l = this->center - source;
 	float tm = Vector3f::dotProduct(l, vec);
@@ -48,20 +49,10 @@ RayHitData Sphere::getRayHitResult(const Vector3f& source, const Vector3f& vec, 
 
 		rhd.pointOfHit = source + vec*t;
 
-		if (rhd.pointOfHit.y > 0)
-		{
-			int ggg = 5;
-		}
+		rhd.directionOfNextRay = Shape::getReflectedRay(rhd.pointOfHit, vec);
 
 		rhd.intensity = Shape::calculateIntensity(rhd.pointOfHit, vec, ambient, lights, shapes);
-		//TODO: fill rhd.directionOfNextRay
-		/*
-		Vector3f normalToImpact = rhd.pointOfHit - this->center;
-		normalToImpact.normalize();
-		Vector3f hittingRay = vec;
-		hittingRay.normalize();
-		Vector3f& r = (-1)*hittingRay + (normalToImpact*(2.0*Vector3f::dotProduct(hittingRay, normalToImpact)));
-		*/
+
 	}
 
 	return rhd;
@@ -78,7 +69,6 @@ float Sphere::rayHitDistance(const Vector3f& source, const Vector3f& vec1)
 {
 	Vector3f vec = vec1;
 	vec.normalize();
-	float retDistance;
 	Vector3f l = this->center - source;
 	float tm = Vector3f::dotProduct(l, vec);
 	float dsqr = Vector3f::dotProduct(l, l) - (tm*tm);

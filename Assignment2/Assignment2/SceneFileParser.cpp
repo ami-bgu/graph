@@ -43,25 +43,23 @@ void SceneFileParser::parseScene(SceneManager& manager, vector<string>& vec)
 void SceneFileParser::parseLight(SceneManager& manager, vector<string>& vec)
 {
 	//for light formatting
-	bool isSpotLight = (vec.size() > 7);
-	int rgbOffset = 0;
-	if (isSpotLight)	rgbOffset = 3;
+
 	Light* light = NULL;
 	float light_dir_x = stof(vec[1]);
 	float light_dir_y = stof(vec[2]);
 	float light_dir_z = stof(vec[3]);
-	float light_intensity_R = stof(vec[4 + rgbOffset]);
-	float light_intensity_G = stof(vec[5 + rgbOffset]);
-	float light_intensity_B = stof(vec[6 + rgbOffset]);
+	float light_intensity_R = stof(vec[4]);
+	float light_intensity_G = stof(vec[5]);
+	float light_intensity_B = stof(vec[6]);
 	printf("\nlight");
 	printf("\n\tDirection\t(%.1f,%.1f,%.1f) \n\tIntensity:\t(%.1f,%.1f,%.1f)",
 		light_dir_x, light_dir_y, light_dir_z, light_intensity_R, light_intensity_G, light_intensity_B);
 	Rgb rgb = { light_intensity_R, light_intensity_G, light_intensity_B };
-	if (isSpotLight)	//spot light
+	if (vec.size() > 7)	//spot light
 	{
-		float spot_x = stof(vec[4]);
-		float spot_y = stof(vec[5]);
-		float spot_z = stof(vec[6]);
+		float spot_x = stof(vec[7]);
+		float spot_y = stof(vec[8]);
+		float spot_z = stof(vec[9]);
 		float cutoff_angle = stof(vec[10]);
 		printf("\n\tSpotlight pos:\t(%.2f,%.2f,%.2f) \n\tCutoff Angle:\t%.2f\n", spot_x, spot_y, spot_z, cutoff_angle);
 		light = new SpotLight(Vector3f(light_dir_x,light_dir_y,light_dir_z),rgb,Vector3f(spot_x,spot_y,spot_z),cutoff_angle);	//TODO: fill constructors
@@ -89,16 +87,35 @@ Material SceneFileParser::parseMaterial(SceneManager& manager, vector<string>& v
 	float Ks_B = stof(vec[9]);
 
 	float shininess = stof(vec[10]);
-	char M = ' ';
-	if (vec.size() > 11) M = vec[11].at(0);
+
+	bool M = false;	//mirror
+	bool T = false; //transparent
+	bool L = false; //lens
+
+	for (size_t i = 11; i < vec.size(); i++)
+	{
+		char c = vec[i].at(0);
+		switch (c)
+		{
+		case 'M':
+			M = true;
+			break;
+		case 'T':
+			T = true;
+			break;
+		case 'L':
+			L = true;
+			break;
+		}
+	}
 
 
-	printf("\tMaterial:\tKa:\t(%.2f,%.2f,%.2f)\n\t\t\tKd:\t(%.2f,%.2f,%.2f)\n\t\t\tKs:\t(%.2f,%.2f,%.2f)\n\t\t\tShininess:\t%.2f\n\t\t\tSpecial:%c\n", Ka_R, Ka_G, Ka_B, Kd_R, Kd_G, Kd_B, Ks_R, Ks_G, Ks_B, shininess, M);
+	printf("\tMaterial:\tKa:\t(%.2f,%.2f,%.2f)\n\t\t\tKd:\t(%.2f,%.2f,%.2f)\n\t\t\tKs:\t(%.2f,%.2f,%.2f)\n\t\t\tShininess:\t%.2f\n\t\t\tSpecial:M-%d,T-%d,L-%d\n", Ka_R, Ka_G, Ka_B, Kd_R, Kd_G, Kd_B, Ks_R, Ks_G, Ks_B, shininess, M, T,L);
 	
 	Rgb ka_rgb = { Ka_R, Ka_G, Ka_B };
 	Rgb kd_rgb = { Kd_R, Kd_G, Kd_B };
 	Rgb ks_rgb = { Ks_R, Ks_G, Ks_B };
-	Material material = { ka_rgb, kd_rgb, ks_rgb, shininess, M=='M' };
+	Material material = { ka_rgb, kd_rgb, ks_rgb, shininess, M,T,L };
 	return material;
 
 }
@@ -151,7 +168,16 @@ void SceneFileParser::parsePlane(SceneManager& manager, vector<string>& vec)
 	vec.erase(vec.begin(), vec.begin() + 8);
 
 	Material& material = SceneFileParser::parseMaterial(manager, vec);
-	Plane* plane = new Plane(Vector3f(plane_center_x, plane_center_y, plane_center_z), Vector3f(plane_normal_x, plane_normal_y, plane_normal_z), plane_width, plane_height, material);
+	Plane* plane;
+	if (material.isLens)
+	{
+		plane = new LensPlane(Vector3f(plane_center_x, plane_center_y, plane_center_z), Vector3f(plane_normal_x, plane_normal_y, plane_normal_z), plane_width, plane_height, material);
+	}
+	else
+	{
+		plane = new Plane(Vector3f(plane_center_x, plane_center_y, plane_center_z), Vector3f(plane_normal_x, plane_normal_y, plane_normal_z), plane_width, plane_height, material);
+
+	}
 
 	manager.addSceneShape(plane);
 	

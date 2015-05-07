@@ -34,6 +34,8 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 		int x = 5;
 	}
 	RayHitData rhd;
+	rhd.shape = this;
+
 	//calculate the point of impact in the infinite plane
 	Vector3f& q0 = this->center;
 	const Vector3f& p0 = source;
@@ -81,6 +83,8 @@ RayHitData Plane::getRayHitResult(const Vector3f& source, const Vector3f& vec, A
 		rhd.isHit = false;
 		return rhd;
 	}
+
+	rhd.directionOfNextRay = Shape::getReflectedRay(rhd.pointOfHit, vec);
 
 	rhd.intensity = Shape::calculateIntensity(p, vec, ambient, lights, shapes);
 	

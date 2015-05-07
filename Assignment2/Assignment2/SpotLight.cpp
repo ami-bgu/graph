@@ -21,7 +21,11 @@ Rgb SpotLight::getRgb(const Vector3f& point)
 	Vector3f L = point - this->center;
 	float d = L.getLength();
 	Vector3f& D = direction;
-	Rgb retVal = { 0, 0, 0 };
+	Rgb retVal = Rgb(0,0,0);
+
+	//float Kc = 1;
+	//float Kl = 0;
+	//float Kq = 0;
 
 	float Kc = 0;
 	float Kl = 1;
@@ -29,7 +33,7 @@ Rgb SpotLight::getRgb(const Vector3f& point)
 
 	float dot = Vector3f::dotProduct(D, L);
 	float angleBetween = acosf( dot / (D.getLength()*L.getLength()) );
-	if (abs(angleBetween) > this->angle/180){
+	if (abs(angleBetween) > this->angle*2.0/180){
 		return retVal;
 	}
 	float d2 = pow(d,2);
@@ -58,6 +62,6 @@ bool SpotLight::doesShapeDropShadowOnPoint(const Vector3f& point, Shape* shape){
 
 bool SpotLight::doesLightComeInTheRightSide(const Vector3f& pointOfImpact, const Vector3f& normal)
 {
-	Vector3f& vecFromObjectToLight = pointOfImpact - this->center;
+	Vector3f& vecFromObjectToLight = this->center - pointOfImpact;
 	return Vector3f::dotProduct(vecFromObjectToLight, normal) >= 0;
 }

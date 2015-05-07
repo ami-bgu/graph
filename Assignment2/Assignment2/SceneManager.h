@@ -31,5 +31,7 @@ private:
 	std::list<Shape*> _shapes;
 	std::list<Light*> _lights;
 
+	RayHitData rayHit(const Vector3f& source, const Vector3f& vec, Shape* lastShape, int recursionLevel);
+
 };
 
