@@ -12,6 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Tirgul.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vector3f.h" />
@@ -24,8 +27,14 @@
     <Library Include="lib\OPENGL32.LIB" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="doll.obj" />
-    <Object Include="simple.obj" />
+    <Resource Include="doll.obj">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Resource>
+    <Resource Include="simple.obj">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Resource>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{23EF93A5-22A5-4F26-8DAB-8D4AC3F56C36}</ProjectGuid>

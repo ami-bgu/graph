@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Tirgul.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Vector3f.h">
@@ -32,11 +35,11 @@
     <Library Include="lib\OPENGL32.LIB" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="doll.obj">
+    <Resource Include="doll.obj">
       <Filter>Resource Files</Filter>
-    </Object>
-    <Object Include="simple.obj">
+    </Resource>
+    <Resource Include="simple.obj">
       <Filter>Resource Files</Filter>
-    </Object>
+    </Resource>
   </ItemGroup>
 </Project>
