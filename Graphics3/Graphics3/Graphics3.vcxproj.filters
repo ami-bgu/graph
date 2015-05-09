@@ -31,4 +31,12 @@
     <Library Include="lib\glut32.lib" />
     <Library Include="lib\OPENGL32.LIB" />
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="doll.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="simple.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+  </ItemGroup>
 </Project>

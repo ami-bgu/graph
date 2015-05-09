@@ -23,6 +23,10 @@
     <Library Include="lib\glut32.lib" />
     <Library Include="lib\OPENGL32.LIB" />
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="doll.obj" />
+    <Object Include="simple.obj" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{23EF93A5-22A5-4F26-8DAB-8D4AC3F56C36}</ProjectGuid>
     <RootNamespace>Graphics3</RootNamespace>
