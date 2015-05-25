@@ -55,7 +55,8 @@ void drawObject()
 {
 	for (std::vector<Triangle>::iterator it = triangles.begin(); it != triangles.end(); ++it)
 	{
-
+		Triangle& triangle = *it;
+		drawTriangle(triangle.vertices, triangle.normal);
 	}
 
 }
@@ -102,7 +103,7 @@ void mydisplay()
 	//draw axises
 	drawAxises();
 
-
+	drawObject();
 	/*
 	//draws a purple square on the back wall
 //	drawSquare(Vector3f(0.3,0,0.3));
@@ -172,7 +173,7 @@ void initLight()
 
 void init()
 {
-	ObjLoader::loadOBJ("simple.obj", triangles);
+	ObjLoader::loadOBJ("doll.obj", triangles);
 
 	float modelMatrix[16],projectionMatrix[16];
 	glClearColor(0,0,0,1);

@@ -22,7 +22,7 @@ bool ObjLoader::loadOBJ(const char* path, vector<Triangle>& out_triangles)
 
 		char lineHeader[128];
 		// read the first word of the line
-		int res = fscanf_s(file, "%s", lineHeader);
+		int res = fscanf_s(file, "%s", lineHeader, sizeof(lineHeader));
 		if (res == EOF)
 			break; // EOF = End Of File. Quit the loop.
 
@@ -69,7 +69,7 @@ bool ObjLoader::loadOBJ(const char* path, vector<Triangle>& out_triangles)
 		vertices[1] = temp_vertices[vertexIndices[i+1] - 1];
 		vertices[2] = temp_vertices[vertexIndices[i+2] - 1];
 
-		Vector3f normal = temp_normals[vertexIndices[i] - 1];
+		Vector3f normal = temp_normals[normalIndices[i] - 1];
 		Triangle triangle(vertices, normal);
 
 		out_triangles.push_back(triangle);
