@@ -16,11 +16,11 @@
     <ClCompile Include="Tirgul.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Triangle.cpp" />
+    <ClCompile Include="Polygon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ObjLoader.h" />
-    <ClInclude Include="Triangle.h" />
+    <ClInclude Include="Polygon.h" />
     <ClInclude Include="Vector3f.h" />
   </ItemGroup>
   <ItemGroup>

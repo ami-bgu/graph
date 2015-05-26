@@ -8,7 +8,7 @@ using namespace std;
 #include "GL\glut.h"
 
 
-vector<Triangle> triangles;
+vector<Polygon> polygons;
 
 GLfloat rot;
 
@@ -41,6 +41,18 @@ void drawAxises()
 	glEnable(GL_LIGHTING);
 }
 
+void drawPolygon(const Polygon& polygon)
+{
+	glBegin(GL_POLYGON);
+	for (size_t i = 0; i < polygon.vertices.size(); i++)
+	{
+		glNormal3f(polygon.normals[i].x, polygon.normals[i].y, polygon.normals[i].z);
+		glVertex3f(polygon.vertices[i].x, polygon.vertices[i].y, polygon.vertices[i].z);
+	}
+	glEnd();
+}
+
+/*
 void drawTriangle(const Vector3f* verticesArray, const Vector3f& normal)
 {
 	glNormal3f(normal.x, normal.y, normal.z);
@@ -50,13 +62,14 @@ void drawTriangle(const Vector3f* verticesArray, const Vector3f& normal)
 	glVertex3f(verticesArray[2].x, verticesArray[2].y, verticesArray[2].z);
 	glEnd();
 }
+*/
 
 void drawObject()
 {
-	for (std::vector<Triangle>::iterator it = triangles.begin(); it != triangles.end(); ++it)
+	for (std::vector<Polygon>::iterator it = polygons.begin(); it != polygons.end(); ++it)
 	{
-		Triangle& triangle = *it;
-		drawTriangle(triangle.vertices, triangle.normal);
+		Polygon& polygon = *it;
+		drawPolygon(polygon);
 	}
 
 }
@@ -173,7 +186,7 @@ void initLight()
 
 void init()
 {
-	ObjLoader::loadOBJ("doll.obj", triangles);
+	ObjLoader::loadOBJ("doll.obj", polygons);
 
 	float modelMatrix[16],projectionMatrix[16];
 	glClearColor(0,0,0,1);
