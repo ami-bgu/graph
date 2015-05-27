@@ -7,37 +7,54 @@ using namespace std;
 #include <stdio.h>
 #include "GL\glut.h"
 
+#define LINE_WIDTH 2.5
 
 vector<SceneObject*> sceneObjects;
 
 GLfloat rot;
+enum Mode { CAMERA_MODE, GLOBAL_MODE};
+Mode _mode;
 
+char* printModeString(){
+	switch (_mode)
+	{
+	case CAMERA_MODE:
+		return "CAMERA_MODE";
+	case GLOBAL_MODE:
+		return "GLOBAL_MODE";
+	default:
+		return "UNDEFINED!";
+	}
+}
 
+//drawing a <width> width line of color <color> from <begin> to <end>
+void drawLine(Vector3f& color, Vector3f& begin, Vector3f& end, GLfloat width){
+	glColor3f(color.x, color.y, color.z);
+	glLineWidth(width);
+
+	glBegin(GL_LINES);
+		glVertex3f(begin.x, begin.y, begin.z);
+		glVertex3f(end.x, end.y, end.z);
+	glEnd();
+}
+
+//drawing our axis
 void drawAxises()
 {
+	GLfloat w = 2.5;
+	Vector3f red = Vector3f(1, 0, 0);
+	Vector3f green = Vector3f(0, 0, 1);
+	Vector3f blue = Vector3f(0, 1, 0);
+
 	glDisable(GL_LIGHTING);
-	glLineWidth(2.5);
 
 	// X axis
-	glColor3f(1, 0, 0);
-	glBegin(GL_LINES);
-		glVertex3f(-50,0,0);
-		glVertex3f(50, 0, 0);
-	glEnd();
-
+	drawLine(red, Vector3f(-50, 0, 0), Vector3f(50, 0, 0), w);
 	// Y axis
-	glColor3f(0, 0, 1);
-	glBegin(GL_LINES);
-		glVertex3f(0, -50, 0);
-		glVertex3f(0, 50, 0);
-	glEnd();
-
+	drawLine(green, Vector3f(0, -50, 0), Vector3f(0, 50, 0), w);
 	// Z axis
-	glColor3f(0, 1, 0);
-	glBegin(GL_LINES);
-		glVertex3f(0, 0, -50);
-		glVertex3f(0, 0, 50);
-	glEnd();
+	drawLine(blue, Vector3f(0, 0, -50), Vector3f(0, 0, 50), w);
+
 	glEnable(GL_LIGHTING);
 }
 
@@ -54,17 +71,6 @@ void drawPolygon(Polygon& polygon)
 	glEnd();
 }
 
-/*
-void drawTriangle(const Vector3f* verticesArray, const Vector3f& normal)
-{
-	glNormal3f(normal.x, normal.y, normal.z);
-	glBegin(GL_TRIANGLES);
-	glVertex3f(verticesArray[0].x, verticesArray[0].y, verticesArray[0].z);
-	glVertex3f(verticesArray[1].x, verticesArray[1].y, verticesArray[1].z);
-	glVertex3f(verticesArray[2].x, verticesArray[2].y, verticesArray[2].z);
-	glEnd();
-}
-*/
 
 void drawObject(SceneObject& object)
 {
@@ -76,35 +82,6 @@ void drawObject(SceneObject& object)
 
 
 }
-
-/*
-void drawTriangle(Vector3f color,Vector3f normal)
-{
-	glMaterialfv(GL_FRONT, GL_EMISSION, color);
-	glNormal3f(normal.x,normal.y,normal.z);
-	glBegin(GL_TRIANGLES);
-		glVertex3f(-1.0 ,1.0f,-1.0);
-		glVertex3f(1.0 , 1.0f,-1.0);
-		glVertex3f(0 , -1.0f,-1.0);
-	glEnd();
-}
-
-void drawSquare(Vector3f color)
-{
-	glMaterialfv(GL_FRONT, GL_EMISSION, color);
-	glBegin(GL_QUADS);
-	glNormal3f(0,1,1);
-	glVertex3f(0.0 ,-1.0f,-1.0);
-	glNormal3f(1,0,1);
-	glVertex3f(1.0 , 0.0f,-1.0);
-	glNormal3f(0,0,1);
-	glVertex3f(0.0 , 1.0f,-1.0);
-	glNormal3f(0,0,1);
-	glVertex3f(-1.0 , 0.0f,-1.0);
-	glEnd();
-}
-
-*/
 
 void mydisplay()
 {
@@ -148,11 +125,6 @@ void mydisplay()
 	
 }
 
-void disp(int value)
-{
-	glutPostRedisplay();
-	glutTimerFunc(1,disp,0);
-}
 
 void initLight()
 {
@@ -194,6 +166,7 @@ void initLight()
 
 void init()
 {
+	_mode = CAMERA_MODE;
 	ObjLoader::loadOBJ("doll.obj", sceneObjects);	//adds objects in obj file to scene objects
 
 	float modelMatrix[16],projectionMatrix[16];
@@ -221,38 +194,103 @@ void init()
 }
 
 
+int _lastClickedMouseButton;
+int _lastX;
+int _lastY;
+int x_drag_length;
+int y_drag_length;
 
-void mouse(int button, int state, int x, int y) 
-{
-   switch (button) {
-	  case GLUT_LEFT_BUTTON:
-		  rot=0;
-		  break;
-	  case GLUT_RIGHT_BUTTON:
-		  if(rot==0)
-			  if(x>y)
-				rot=0.01;
-			  else rot=-0.01;
-		  else (rot+=rot);
-	  break;
-   }
+void mouseMotionCallback(int x, int y){
+	printf("[Event=mouse motion] (%d,%d) \n", x, y);
+	x_drag_length = x - _lastX;
+	y_drag_length = y - _lastY;
+	printf("last x: %d, x: %d, distance: %d \n", _lastX, x, x_drag_length);
+	printf("last y: %d, x: %d, distance: %d \n", _lastY, y, y_drag_length);
+	printf("screen width:%d, screen height:%d \n", glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	switch (_lastClickedMouseButton){
+		case GLUT_LEFT_BUTTON:
+			printf("rotating camera x_length:%f, y_length: %f", ((float)y_drag_length) / (float)glutGet(GLUT_WINDOW_WIDTH), ((float)x_drag_length) / (float)glutGet(GLUT_WINDOW_HEIGHT));
+			glRotatef(10, 
+				0,
+				((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH),
+				0
+			);
+			glRotatef(10,
+				((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_SCREEN_HEIGHT),
+				0,
+				0
+			);
+			break;
+			
+		case GLUT_RIGHT_BUTTON:
+			break;
+		case GLUT_MIDDLE_BUTTON:
+			break;
+		default:
+			printf("error - unsuported mouseClick");
+	}
+	
+	glutPostRedisplay();
+
+	_lastX = x;
+	_lastY = y;
+
 }
 
+void globalRotate()
+{
+
+}
+
+void mouse(int button, int state, int x, int y)
+{
+	printf("[Event=mouse] state: %d (%d,%d) \n", state,x,y);
+	_lastClickedMouseButton = button;
+	_lastX = x;
+	_lastY = y;
+
+/*	if (_mode == CAMERA_MODE){
+		mouseCameraModeHandler(button, state, x, y);
+	}
+	else if (_mode == GLOBAL_MODE){
+		mouseGlobalModeHandler(button, state, x, y);
+	}
+*/
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	//switch camera on pressing SPACE
+	case ' ':
+		_mode = (_mode == CAMERA_MODE) ? GLOBAL_MODE : CAMERA_MODE;
+		printf("[info] Mode Changed: %s \n", printModeString());
+		break;
+	default:
+		break;
+	}
+}
+
+void specialKeys(int key, int x, int y)
+{
+	printf("special:%d;", key);
+}
 
 int main(int  argc,  char** argv) 
 {
-
    glutInit (& argc, argv) ;
    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB) ;
-   glutInitWindowSize ( 512,512) ;
-   glutCreateWindow("Lighting") ;
+   glutInitWindowSize (512,512) ;
+   glutCreateWindow("Assignment4");
   
-   
    init();
    glutDisplayFunc(mydisplay);   
 
    glutMouseFunc(mouse);
+   glutKeyboardFunc(keyboard);
+   glutSpecialFunc(specialKeys);
+   glutMotionFunc(mouseMotionCallback);
    
-   glutTimerFunc(2,disp,0);
-   glutMainLoop ();
+   glutMainLoop();
 }
