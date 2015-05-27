@@ -118,7 +118,7 @@ void mydisplay()
 	}
 	
 
-	//globalRotate();
+	globalRotate();
 	/*
 	//draws a purple square on the back wall
 //	drawSquare(Vector3f(0.3,0,0.3));
