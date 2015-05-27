@@ -11,10 +11,15 @@ using namespace std;
 
 vector<SceneObject*> sceneObjects;
 
-GLfloat rot;
+//GLfloat rot;
 enum Mode { CAMERA_MODE, GLOBAL_MODE};
 Mode _mode;
-Vector3f globalRotationAngle;
+Vector3f _globalRotationAngle;
+Vector3f _globalTranslation;
+float _scale = 1;
+float _fovAngle = 60;
+int _lastClickedKey = 0;
+
 
 
 char* printModeString(){
@@ -85,16 +90,24 @@ void drawObject(SceneObject& object)
 
 }
 
+void globalTranslate()
+{
+	printf("translating: %.2f,%.2f,%.2f\n", _globalTranslation.x, _globalTranslation.y, _globalTranslation.z);
+	glTranslatef(_globalTranslation.x * 50.0, 0, 0);
+	glTranslatef(0, _globalTranslation.y * 50.0, 0);
+	glTranslatef(0, 0, _globalTranslation.z * 50.0);
+
+	_globalTranslation.makeZero();
+}
+
 void globalRotate()
 {
-	printf("rotating: %.2f,%.2f,%.2f\n", globalRotationAngle.x, globalRotationAngle.y, globalRotationAngle.z);
-	glRotatef(10,
-		globalRotationAngle.x,
-		globalRotationAngle.y,
-		globalRotationAngle.z
-		);
+	printf("rotating: %.2f,%.2f,%.2f\n", _globalRotationAngle.x, _globalRotationAngle.y, _globalRotationAngle.z);
+	glRotatef(_globalRotationAngle.x * 180.0, 1, 0, 0);
+	glRotatef(_globalRotationAngle.y * 180.0, 0, 1, 0);
+	glRotatef(_globalRotationAngle.z * 180.0, 0, 0, 1);
 
-	globalRotationAngle.makeZero();
+	_globalRotationAngle.makeZero();
 }
 
 void mydisplay()
@@ -105,20 +118,44 @@ void mydisplay()
 	GLfloat emission[] ={0,0,1};
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
+	//SHIT CODE
+	glMatrixMode(GL_PROJECTION); /* switch matrix mode */
+	glLoadIdentity();
+	gluPerspective(_fovAngle, 1, 2, 200);
+	glTranslatef(0, 0, -100);	//take camera backwards
+	//END OF SHIT CODE
+
+	glMatrixMode(GL_MODELVIEW);
+
 	//glRotatef(rot,0,1,0); //rotate scene
 	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	
 	//draw axises
+	glPushMatrix();
+	glLoadIdentity();
 	drawAxises();
+	glPopMatrix();
+	
+	if (_lastClickedKey == GLUT_KEY_UP || _lastClickedKey == GLUT_KEY_DOWN)	//i want it to happen only once for each press
+	{
+		printf("scaling %.2f\n", _scale);
+		glScalef(_scale, _scale, _scale);
+		_lastClickedKey = 0;
+	}
+	globalRotate();
+	globalTranslate();
 
+	//draw objects
 	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
 	{
 		SceneObject* object = *it;
-		drawObject(*object);
+		drawObject(*object);		
 	}
-	
 
-	globalRotate();
+
+
+
+
 	/*
 	//draws a purple square on the back wall
 //	drawSquare(Vector3f(0.3,0,0.3));
@@ -206,7 +243,7 @@ void init()
 	 /* return to modelview mode */
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	rot=0.01;
+//	rot=0.01;
 	initLight();
 }
 
@@ -226,12 +263,15 @@ void mouseMotionCallback(int x, int y){
 	switch (_lastClickedMouseButton){
 		case GLUT_LEFT_BUTTON:
 			//printf("rotating camera x_length:%f, y_length: %f", ((float)y_drag_length) / (float)glutGet(GLUT_WINDOW_WIDTH), ((float)x_drag_length) / (float)glutGet(GLUT_WINDOW_HEIGHT));
-			globalRotationAngle.y += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
-			break;
-			
+			_globalRotationAngle.x += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+			_globalRotationAngle.z += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
+			break;		
 		case GLUT_RIGHT_BUTTON:
+			_globalTranslation.x += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
+			_globalTranslation.y -= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 			break;
 		case GLUT_MIDDLE_BUTTON:
+			_globalTranslation.z += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 			break;
 		default:
 			printf("error - unsupported key\n");
@@ -239,7 +279,7 @@ void mouseMotionCallback(int x, int y){
 	
 	_lastX = x;
 	_lastY = y;
-	//glutPostRedisplay();
+	glutPostRedisplay();
 }
 
 
@@ -276,19 +316,40 @@ void keyboard(unsigned char key, int x, int y)
 {
 	switch (key)
 	{
-	//switch camera on pressing SPACE
 	case ' ':
+		//switch camera on pressing SPACE
 		_mode = (_mode == CAMERA_MODE) ? GLOBAL_MODE : CAMERA_MODE;
 		printf("[info] Mode Changed: %s \n", printModeString());
 		break;
 	default:
 		break;
 	}
+	_lastClickedKey = key;
 }
 
 void specialKeys(int key, int x, int y)
 {
 	printf("special:%d;", key);
+
+	switch (key)
+	{
+	case GLUT_KEY_F2:
+		_fovAngle *= 0.95;
+		break;
+	case GLUT_KEY_F3:
+		_fovAngle *= 1.05;
+		break;
+	case GLUT_KEY_UP:
+		_scale = 1.05;
+		break;
+	case GLUT_KEY_DOWN:
+		_scale = 0.95;
+		break;
+	default:
+		break;
+	}
+	_lastClickedKey = key;
+	glutPostRedisplay();
 }
 
 int main(int  argc,  char** argv) 
