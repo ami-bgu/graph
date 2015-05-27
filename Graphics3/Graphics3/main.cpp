@@ -14,6 +14,8 @@ vector<SceneObject*> sceneObjects;
 GLfloat rot;
 enum Mode { CAMERA_MODE, GLOBAL_MODE};
 Mode _mode;
+Vector3f globalRotationAngle;
+
 
 char* printModeString(){
 	switch (_mode)
@@ -83,14 +85,27 @@ void drawObject(SceneObject& object)
 
 }
 
+void globalRotate()
+{
+	printf("rotating: %.2f,%.2f,%.2f\n", globalRotationAngle.x, globalRotationAngle.y, globalRotationAngle.z);
+	glRotatef(10,
+		globalRotationAngle.x,
+		globalRotationAngle.y,
+		globalRotationAngle.z
+		);
+
+	globalRotationAngle.makeZero();
+}
+
 void mydisplay()
 {
+	printf("mydisplay\n");
 	GLfloat light_position[]={0,0,3,1};
 	GLfloat light_direction[]={0,0,-1};
 	GLfloat emission[] ={0,0,1};
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
-	glRotatef(rot,0,1,0); //rotate scene
+	//glRotatef(rot,0,1,0); //rotate scene
 	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	
 	//draw axises
@@ -102,6 +117,8 @@ void mydisplay()
 		drawObject(*object);
 	}
 	
+
+	//globalRotate();
 	/*
 	//draws a purple square on the back wall
 //	drawSquare(Vector3f(0.3,0,0.3));
@@ -197,29 +214,19 @@ void init()
 int _lastClickedMouseButton;
 int _lastX;
 int _lastY;
-int x_drag_length;
-int y_drag_length;
+
 
 void mouseMotionCallback(int x, int y){
-	printf("[Event=mouse motion] (%d,%d) \n", x, y);
-	x_drag_length = x - _lastX;
-	y_drag_length = y - _lastY;
-	printf("last x: %d, x: %d, distance: %d \n", _lastX, x, x_drag_length);
-	printf("last y: %d, x: %d, distance: %d \n", _lastY, y, y_drag_length);
-	printf("screen width:%d, screen height:%d \n", glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+	//printf("[Event=mouse motion] (%d,%d) \n", x, y);
+	int x_drag_length = x - _lastX;
+	int y_drag_length = y - _lastY;
+	//printf("last x: %d, x: %d, distance: %d \n", _lastX, x, x_drag_length);
+	//printf("last y: %d, x: %d, distance: %d \n", _lastY, y, y_drag_length);
+	//printf("screen width:%d, screen height:%d \n", glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 	switch (_lastClickedMouseButton){
 		case GLUT_LEFT_BUTTON:
-			printf("rotating camera x_length:%f, y_length: %f", ((float)y_drag_length) / (float)glutGet(GLUT_WINDOW_WIDTH), ((float)x_drag_length) / (float)glutGet(GLUT_WINDOW_HEIGHT));
-			glRotatef(10, 
-				0,
-				((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH),
-				0
-			);
-			glRotatef(10,
-				((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_SCREEN_HEIGHT),
-				0,
-				0
-			);
+			//printf("rotating camera x_length:%f, y_length: %f", ((float)y_drag_length) / (float)glutGet(GLUT_WINDOW_WIDTH), ((float)x_drag_length) / (float)glutGet(GLUT_WINDOW_HEIGHT));
+			globalRotationAngle.y += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
 			break;
 			
 		case GLUT_RIGHT_BUTTON:
@@ -227,27 +234,34 @@ void mouseMotionCallback(int x, int y){
 		case GLUT_MIDDLE_BUTTON:
 			break;
 		default:
-			printf("error - unsuported mouseClick");
+			printf("error - unsupported key\n");
 	}
 	
-	glutPostRedisplay();
-
 	_lastX = x;
 	_lastY = y;
-
+	//glutPostRedisplay();
 }
 
-void globalRotate()
-{
 
-}
 
 void mouse(int button, int state, int x, int y)
 {
 	printf("[Event=mouse] state: %d (%d,%d) \n", state,x,y);
-	_lastClickedMouseButton = button;
-	_lastX = x;
-	_lastY = y;
+
+
+	switch (state)
+	{
+	case GLUT_DOWN:
+		_lastClickedMouseButton = button;
+		_lastX = x;
+		_lastY = y;
+		break;
+	case GLUT_UP:
+		_lastClickedMouseButton = 0;
+		break;
+	default:
+		break;
+	}
 
 /*	if (_mode == CAMERA_MODE){
 		mouseCameraModeHandler(button, state, x, y);
