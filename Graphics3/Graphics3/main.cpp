@@ -8,7 +8,7 @@ using namespace std;
 #include "GL\glut.h"
 
 
-vector<Polygon> polygons;
+vector<SceneObject*> sceneObjects;
 
 GLfloat rot;
 
@@ -41,13 +41,15 @@ void drawAxises()
 	glEnable(GL_LIGHTING);
 }
 
-void drawPolygon(const Polygon& polygon)
+void drawPolygon(Polygon& polygon)
 {
+	vector<Vector3f>& normals = *(polygon.normals);
+	vector<Vector3f>& vertices = *(polygon.vertices);
 	glBegin(GL_POLYGON);
-	for (size_t i = 0; i < polygon.vertices.size(); i++)
+	for (size_t i = 0; i < polygon.vertices->size(); i++)
 	{
-		glNormal3f(polygon.normals[i].x, polygon.normals[i].y, polygon.normals[i].z);
-		glVertex3f(polygon.vertices[i].x, polygon.vertices[i].y, polygon.vertices[i].z);
+		glNormal3f(normals[i].x, normals[i].y, normals[i].z);
+		glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
 	}
 	glEnd();
 }
@@ -64,13 +66,14 @@ void drawTriangle(const Vector3f* verticesArray, const Vector3f& normal)
 }
 */
 
-void drawObject()
+void drawObject(SceneObject& object)
 {
-	for (std::vector<Polygon>::iterator it = polygons.begin(); it != polygons.end(); ++it)
+	for (std::vector<Polygon*>::iterator it = object.polygons->begin(); it != object.polygons->end(); ++it)
 	{
-		Polygon& polygon = *it;
-		drawPolygon(polygon);
+		Polygon* polygon = *it;
+		drawPolygon(*polygon);
 	}
+
 
 }
 
@@ -116,7 +119,12 @@ void mydisplay()
 	//draw axises
 	drawAxises();
 
-	drawObject();
+	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
+	{
+		SceneObject* object = *it;
+		drawObject(*object);
+	}
+	
 	/*
 	//draws a purple square on the back wall
 //	drawSquare(Vector3f(0.3,0,0.3));
@@ -186,7 +194,7 @@ void initLight()
 
 void init()
 {
-	ObjLoader::loadOBJ("doll.obj", polygons);
+	ObjLoader::loadOBJ("doll.obj", sceneObjects);	//adds objects in obj file to scene objects
 
 	float modelMatrix[16],projectionMatrix[16];
 	glClearColor(0,0,0,1);

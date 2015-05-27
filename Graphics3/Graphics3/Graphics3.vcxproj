@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ObjLoader.cpp" />
+    <ClCompile Include="SceneObject.cpp" />
     <ClCompile Include="Tirgul.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -21,6 +22,7 @@
   <ItemGroup>
     <ClInclude Include="ObjLoader.h" />
     <ClInclude Include="Polygon.h" />
+    <ClInclude Include="SceneObject.h" />
     <ClInclude Include="Vector3f.h" />
   </ItemGroup>
   <ItemGroup>

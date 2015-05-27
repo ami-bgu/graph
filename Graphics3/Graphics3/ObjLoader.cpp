@@ -16,10 +16,12 @@ void ObjLoader::splitString(const string& str, vector<string>& output){
 	if (tmp != "")	output.push_back(tmp);
 }
 
-bool ObjLoader::loadOBJ(const char* path, vector<Polygon>& out_polygons)
+void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 {
-
+	
 	printf("Loading OBJ file %s...\n", path);
+
+	vector<Polygon*>* polygons = new vector<Polygon*>();
 
 	vector<Vector3f> temp_vertices;
 	vector<Vector3f> temp_normals;
@@ -35,7 +37,10 @@ bool ObjLoader::loadOBJ(const char* path, vector<Polygon>& out_polygons)
 		ObjLoader::splitString(line, vec);
 		if (vec.empty())	continue;
 
-		if (vec[0].compare(0, 2, "vn") == 0){
+		if (vec[0].compare(0, 1, "o") == 0){
+			//TODO: handle this
+		}
+		else if (vec[0].compare(0, 2, "vn") == 0){
 			Vector3f normal;
 			normal.x = stof(vec[1]);
 			normal.y = stof(vec[2]);
@@ -50,19 +55,19 @@ bool ObjLoader::loadOBJ(const char* path, vector<Polygon>& out_polygons)
 			temp_vertices.push_back(vertex);
 		}
 		else if(vec[0].compare(0, 1, "f") == 0){
-			vector<Vector3f> vertices;
-			vector<Vector3f> normals;
+			vector<Vector3f>* vertices = new vector<Vector3f>();
+			vector<Vector3f>* normals = new vector<Vector3f>();;
 			for (size_t i = 1; i < vec.size(); i+=2)
 			{
 				int index = stoi(vec[i]);
-				vertices.push_back(temp_vertices[index - 1]);
+				vertices->push_back(temp_vertices[index - 1]);
 				index = stoi(vec[i+1]);
-				normals.push_back(temp_normals[index - 1]);
+				normals->push_back(temp_normals[index - 1]);
 			}
-			Polygon polygon(vertices, normals);
-			out_polygons.push_back(polygon);
+			Polygon* polygon = new Polygon(vertices, normals);
+			polygons->push_back(polygon);
 		}
 	}
 
-	return true;
+	objects.push_back(new SceneObject(polygons));
 }
