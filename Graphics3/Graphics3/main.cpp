@@ -20,6 +20,13 @@ float _scale = 1;
 float _fovAngle = 60;
 int _lastClickedKey = 0;
 
+GLfloat _cameraMatrix[16];
+GLfloat _modelMatrix[16];
+GLfloat _axisesMatrix[16];
+
+Vector3f _cameraRotationAngle;
+Vector3f _cameraTranslation;
+
 
 
 char* printModeString(){
@@ -90,60 +97,44 @@ void drawObject(SceneObject& object)
 
 }
 
-void globalTranslate()
-{
-	printf("translating: %.2f,%.2f,%.2f\n", _globalTranslation.x, _globalTranslation.y, _globalTranslation.z);
-	glTranslatef(_globalTranslation.x * 50.0, 0, 0);
-	glTranslatef(0, _globalTranslation.y * 50.0, 0);
-	glTranslatef(0, 0, _globalTranslation.z * 50.0);
-
-	_globalTranslation.makeZero();
-}
-
-void globalRotate()
-{
-	printf("rotating: %.2f,%.2f,%.2f\n", _globalRotationAngle.x, _globalRotationAngle.y, _globalRotationAngle.z);
-	glRotatef(_globalRotationAngle.x * 180.0, 1, 0, 0);
-	glRotatef(_globalRotationAngle.y * 180.0, 0, 1, 0);
-	glRotatef(_globalRotationAngle.z * 180.0, 0, 0, 1);
-
-	_globalRotationAngle.makeZero();
-}
 
 void mydisplay()
 {
-	printf("mydisplay\n");
-	GLfloat light_position[]={0,0,3,1};
-	GLfloat light_direction[]={0,0,-1};
-	GLfloat emission[] ={0,0,1};
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 	
-	//SHIT CODE
-	glMatrixMode(GL_PROJECTION); /* switch matrix mode */
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(_fovAngle, 1, 2, 200);
-	glTranslatef(0, 0, -100);	//take camera backwards
-	//END OF SHIT CODE
-
 	glMatrixMode(GL_MODELVIEW);
 
-	//glRotatef(rot,0,1,0); //rotate scene
-	//glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	
-	//draw axises
-	glPushMatrix();
-	glLoadIdentity();
-	drawAxises();
-	glPopMatrix();
-	
-	if (_lastClickedKey == GLUT_KEY_UP || _lastClickedKey == GLUT_KEY_DOWN)	//i want it to happen only once for each press
+	if (_mode == CAMERA_MODE)
 	{
-		printf("scaling %.2f\n", _scale);
-		glScalef(_scale, _scale, _scale);
-		_lastClickedKey = 0;
+		glLoadIdentity();
+		glRotatef(_cameraRotationAngle.y*180.0, 0, 1, 0);
+		glRotatef(_cameraRotationAngle.x*180.0, 1, 0, 0);
+		glTranslatef(_cameraTranslation.x*50.0, _cameraTranslation.y*50.0, _cameraTranslation.z*50.0);
+		glMultMatrixf(_cameraMatrix);
+		glGetFloatv(GL_MODELVIEW_MATRIX, _cameraMatrix);
+		glMultMatrixf(_modelMatrix);
+		_cameraTranslation.makeZero();
+		_cameraRotationAngle.makeZero();
 	}
-	globalRotate();
-	globalTranslate();
+	else	//GLOBAL_MODE
+	{
+		glLoadMatrixf(_modelMatrix);
+		glRotatef(_globalRotationAngle.z*180.0, 0, 0, -1);
+		glRotatef(_globalRotationAngle.x*180.0, 1, 0, 0);
+		glTranslatef(_globalTranslation.x*50.0, _globalTranslation.y*50.0, _globalTranslation.z*50.0);
+		glGetFloatv(GL_MODELVIEW_MATRIX, _modelMatrix);
+		glLoadMatrixf(_cameraMatrix);
+		glMultMatrixf(_modelMatrix);
+		_globalTranslation.makeZero();
+		_globalRotationAngle.makeZero();
+	}
+
+	glScalef(_scale, _scale, _scale);
+
+	drawAxises();
 
 	//draw objects
 	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
@@ -152,29 +143,6 @@ void mydisplay()
 		drawObject(*object);		
 	}
 
-
-
-
-
-	/*
-	//draws a purple square on the back wall
-//	drawSquare(Vector3f(0.3,0,0.3));
-
-	//draws a green triangle on the ceiling
-	glPushMatrix();
-	glRotatef(90,1,0,0);
-	
-//	drawTriangle(Vector3f(0.0,.5,0),Vector3f(0,-1,0));
-	glPopMatrix();
-	
-	//draws a white sphere in the midle
-	glMaterialfv(GL_FRONT, GL_EMISSION, emission);
-	glutSolidSphere(0.5,32,32);
-
-	//draws cube
-	glMaterialfv(GL_FRONT, GL_EMISSION, Vector3f(1,1,1));
-	glutWireCube(2.0f);
-	*/
 	glFlush(); //print to screen
 	
 }
@@ -231,19 +199,16 @@ void init()
 
 	//defines view mode
 	gluPerspective(60,1,2,200);
-	//glRotatef(180,0,1,0);
-	glTranslatef(0,0,-100);	//take camera backwards
-	
-	//glTranslatef(0,1,0);
-	//gluLookAt(0,-1,-1,0,-2,-2,1,1,0);  //define view direction
-	//gluLookAt(0,-1,-1,0,0,0,1,1,0);  //define view direction
-	
 
 	glEnable(GL_DEPTH_TEST);  //define in which order the scene will built
 	 /* return to modelview mode */
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-//	rot=0.01;
+	glGetFloatv(GL_MODELVIEW_MATRIX, _cameraMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, _axisesMatrix);
+	glTranslatef(0, 0, -100);
+	glGetFloatv(GL_MODELVIEW_MATRIX, _modelMatrix);
+	
 	initLight();
 }
 
@@ -253,16 +218,13 @@ int _lastX;
 int _lastY;
 
 
-void mouseMotionCallback(int x, int y){
-	//printf("[Event=mouse motion] (%d,%d) \n", x, y);
+void mouseGlobalMotionCallback(int x, int y){
+
 	int x_drag_length = x - _lastX;
 	int y_drag_length = y - _lastY;
-	//printf("last x: %d, x: %d, distance: %d \n", _lastX, x, x_drag_length);
-	//printf("last y: %d, x: %d, distance: %d \n", _lastY, y, y_drag_length);
-	//printf("screen width:%d, screen height:%d \n", glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
+
 	switch (_lastClickedMouseButton){
 		case GLUT_LEFT_BUTTON:
-			//printf("rotating camera x_length:%f, y_length: %f", ((float)y_drag_length) / (float)glutGet(GLUT_WINDOW_WIDTH), ((float)x_drag_length) / (float)glutGet(GLUT_WINDOW_HEIGHT));
 			_globalRotationAngle.x += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 			_globalRotationAngle.z += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
 			break;		
@@ -271,7 +233,7 @@ void mouseMotionCallback(int x, int y){
 			_globalTranslation.y -= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 			break;
 		case GLUT_MIDDLE_BUTTON:
-			_globalTranslation.z += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+			_globalTranslation.z -= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 			break;
 		default:
 			printf("error - unsupported key\n");
@@ -283,12 +245,34 @@ void mouseMotionCallback(int x, int y){
 }
 
 
+void mouseCameraMotionCallback(int x, int y){
+	int x_drag_length = x - _lastX;
+	int y_drag_length = y - _lastY;	//positive means draggin down
+
+	switch (_lastClickedMouseButton){
+	case GLUT_LEFT_BUTTON:
+		_cameraRotationAngle.x += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+		_cameraRotationAngle.y += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
+		break;
+	case GLUT_RIGHT_BUTTON:
+		_cameraTranslation.x -= ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
+		_cameraTranslation.y += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+		break;
+	case GLUT_MIDDLE_BUTTON:
+		printf("drag %d trans %f\n", y_drag_length, _cameraTranslation.z);
+		_cameraTranslation.z -= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+		break;
+	default:
+		printf("error - unsupported key\n");
+	}
+
+	_lastX = x;
+	_lastY = y;
+	glutPostRedisplay();
+}
 
 void mouse(int button, int state, int x, int y)
 {
-	printf("[Event=mouse] state: %d (%d,%d) \n", state,x,y);
-
-
 	switch (state)
 	{
 	case GLUT_DOWN:
@@ -299,18 +283,9 @@ void mouse(int button, int state, int x, int y)
 	case GLUT_UP:
 		_lastClickedMouseButton = 0;
 		break;
-	default:
-		break;
 	}
-
-/*	if (_mode == CAMERA_MODE){
-		mouseCameraModeHandler(button, state, x, y);
-	}
-	else if (_mode == GLOBAL_MODE){
-		mouseGlobalModeHandler(button, state, x, y);
-	}
-*/
 }
+
 
 void keyboard(unsigned char key, int x, int y)
 {
@@ -320,6 +295,8 @@ void keyboard(unsigned char key, int x, int y)
 		//switch camera on pressing SPACE
 		_mode = (_mode == CAMERA_MODE) ? GLOBAL_MODE : CAMERA_MODE;
 		printf("[info] Mode Changed: %s \n", printModeString());
+		if (_mode == CAMERA_MODE)	glutMotionFunc(mouseCameraMotionCallback);
+		else						glutMotionFunc(mouseGlobalMotionCallback);
 		break;
 	default:
 		break;
@@ -329,21 +306,19 @@ void keyboard(unsigned char key, int x, int y)
 
 void specialKeys(int key, int x, int y)
 {
-	printf("special:%d;", key);
-
 	switch (key)
 	{
 	case GLUT_KEY_F2:
-		_fovAngle *= 0.95;
+		_fovAngle += 0.05;
 		break;
 	case GLUT_KEY_F3:
-		_fovAngle *= 1.05;
+		_fovAngle -= 0.05;
 		break;
 	case GLUT_KEY_UP:
-		_scale = 1.05;
+		_scale *= 1.05;
 		break;
 	case GLUT_KEY_DOWN:
-		_scale = 0.95;
+		_scale *= 0.95;
 		break;
 	default:
 		break;
@@ -365,7 +340,7 @@ int main(int  argc,  char** argv)
    glutMouseFunc(mouse);
    glutKeyboardFunc(keyboard);
    glutSpecialFunc(specialKeys);
-   glutMotionFunc(mouseMotionCallback);
+   glutMotionFunc(mouseCameraMotionCallback);	//changes between modes
    
    glutMainLoop();
 }

@@ -13,7 +13,7 @@ using namespace std;
 class ObjLoader
 {
 public:
-	static void splitString(const string& str, vector<string>& output);
+	static void nextLine(FILE* file);
 	static void loadOBJ(const char* path, vector<SceneObject*>& objects);
 
 };

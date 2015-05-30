@@ -1,73 +1,72 @@
 #include "ObjLoader.h"
 
-
-void ObjLoader::splitString(const string& str, vector<string>& output){
-	string tmp = "";
-
-	for (unsigned int i = 0; i<str.length(); i++){
-		if (str[i] != ' ' && str[i] != ',' && str[i] != '/'){	//delimiters
-			tmp = tmp + str[i];
-		}
-		else{
-			if (tmp != "")	output.push_back(tmp);
-			tmp = "";
-		}
-	}
-	if (tmp != "")	output.push_back(tmp);
+void ObjLoader::nextLine(FILE* file){
+	fscanf_s(file, "%*[^\n]%*c");
 }
 
 void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 {
-	
 	printf("Loading OBJ file %s...\n", path);
 
 	vector<Polygon*>* polygons = new vector<Polygon*>();
+	vector<Vector3f> temp_vertices, temp_normals;
+	vector<Vector3f> *vertices, *normals;
+	Vector3f tmpVec;
+	FILE* file;
+	char c, firstChar, secondChar;
+	int i, tmpA, tmpB;
 
-	vector<Vector3f> temp_vertices;
-	vector<Vector3f> temp_normals;
-
-	std::ifstream file(path);
-	std::string line;
-	
-	while (std::getline(file, line)){
-		if (line.length() == 0)	continue;
-		if (line.length() >= 2 && line.compare(0, 2, "//") == 0)	continue;
-
-		vector<string> vec;
-		ObjLoader::splitString(line, vec);
-		if (vec.empty())	continue;
-
-		if (vec[0].compare(0, 1, "o") == 0){
-			//TODO: handle this
-		}
-		else if (vec[0].compare(0, 2, "vn") == 0){
-			Vector3f normal;
-			normal.x = stof(vec[1]);
-			normal.y = stof(vec[2]);
-			normal.z = stof(vec[3]);
-			temp_normals.push_back(normal);
-		}
-		else if (vec[0].compare(0, 1, "v") == 0){
-			Vector3f vertex;
-			vertex.x = stof(vec[1]);
-			vertex.y = stof(vec[2]);
-			vertex.z = stof(vec[3]);
-			temp_vertices.push_back(vertex);
-		}
-		else if(vec[0].compare(0, 1, "f") == 0){
-			vector<Vector3f>* vertices = new vector<Vector3f>();
-			vector<Vector3f>* normals = new vector<Vector3f>();;
-			for (size_t i = 1; i < vec.size(); i+=2)
-			{
-				int index = stoi(vec[i]);
-				vertices->push_back(temp_vertices[index - 1]);
-				index = stoi(vec[i+1]);
-				normals->push_back(temp_normals[index - 1]);
-			}
-			Polygon* polygon = new Polygon(vertices, normals);
-			polygons->push_back(polygon);
-		}
+	if (fopen_s(&file, path, "r") < 0){
+		printf("Error opening object file '%s'. Exiting.\n", path);
+		exit(1);
 	}
 
+	while (fscanf_s(file, "%c", &firstChar) > 0){
+		switch (firstChar)
+		{
+			case 'v':
+				fscanf_s(file, "%c", &secondChar);
+				if (secondChar == 'n'){
+					fscanf_s(file, " %f %f %f \n", &tmpVec.x, &tmpVec.y, &tmpVec.z);
+					temp_normals.push_back(tmpVec);
+
+				}
+				else{
+					fscanf_s(file, "%f %f %f \n", &tmpVec.x, &tmpVec.y, &tmpVec.z);
+					temp_vertices.push_back(tmpVec);
+				}
+
+				break;
+
+			case 'f':
+				vertices = new vector<Vector3f>();
+				normals = new vector<Vector3f>();
+
+				while (fscanf_s(file, "%c", &c) > 0){
+					if (c == '\n') break;
+
+					fscanf_s(file, "%d//%d ", &tmpA,&tmpB);
+					fseek(file, -1, SEEK_CUR);
+					vertices->push_back(temp_vertices[tmpA-1]);
+					normals->push_back(temp_normals[tmpB-1]);
+				}			
+				polygons->push_back(new Polygon(vertices, normals));
+				
+				break;
+
+			case '\n':
+				break;
+			case 'o':
+			case 'g':
+			case '#':
+				nextLine(file);
+				break;
+			default:
+				printf("error - unrecognized format. got: %d\n", firstChar);
+				break;
+		}
+
+	}
 	objects.push_back(new SceneObject(polygons));
+
 }
