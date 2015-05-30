@@ -110,6 +110,7 @@ void mydisplay()
 	if (_mode == CAMERA_MODE)
 	{
 		glLoadIdentity();
+		//printf("xRot %.2f yRot %.2f\n", _cameraRotationAngle.x*180.0, _cameraRotationAngle.y*180.0);
 		glRotatef(_cameraRotationAngle.y*180.0, 0, 1, 0);
 		glRotatef(_cameraRotationAngle.x*180.0, 1, 0, 0);
 		glTranslatef(_cameraTranslation.x*50.0, _cameraTranslation.y*50.0, _cameraTranslation.z*50.0);
@@ -134,7 +135,11 @@ void mydisplay()
 
 	glScalef(_scale, _scale, _scale);
 
+	glPushMatrix();
+	glLoadMatrixf(_cameraMatrix);
+	glMultMatrixf(_axisesMatrix);
 	drawAxises();
+	glPopMatrix();
 
 	//draw objects
 	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
@@ -205,9 +210,10 @@ void init()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glGetFloatv(GL_MODELVIEW_MATRIX, _cameraMatrix);
-	glGetFloatv(GL_MODELVIEW_MATRIX, _axisesMatrix);
 	glTranslatef(0, 0, -100);
 	glGetFloatv(GL_MODELVIEW_MATRIX, _modelMatrix);
+	glGetFloatv(GL_MODELVIEW_MATRIX, _axisesMatrix);
+
 	
 	initLight();
 }
@@ -259,7 +265,6 @@ void mouseCameraMotionCallback(int x, int y){
 		_cameraTranslation.y += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 		break;
 	case GLUT_MIDDLE_BUTTON:
-		printf("drag %d trans %f\n", y_drag_length, _cameraTranslation.z);
 		_cameraTranslation.z -= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
 		break;
 	default:
