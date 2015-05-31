@@ -114,8 +114,6 @@ void mydisplay()
 	gluPerspective(_fovAngle, 1, 2, 200);
 	glMatrixMode(GL_MODELVIEW);
 
-	GLfloat m[16];
-
 	if (_mode == CAMERA_MODE)
 	{
 		//Camera Rotation
@@ -251,7 +249,6 @@ void init()
 	_mode = CAMERA_MODE;
 	ObjLoader::loadOBJ("doll.obj", sceneObjects);	//adds objects in obj file to scene objects
 
-	float modelMatrix[16], projectionMatrix[16];
 	glClearColor(0, 0, 0, 1);
 
 	glMatrixMode(GL_PROJECTION); /* switch matrix mode */
