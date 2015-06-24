@@ -19,8 +19,16 @@ Vector3f _globalTranslation;
 float _scale = 1;
 float _fovAngle = 60;
 int _lastClickedKey = 0;
+float _zValue[4];
 
+vector<GLint> _selectedObjects;
+vector<GLfloat> _xTranslations;
+vector<GLfloat> _yTranslations;
+vector<GLfloat> _zTranslations;
 
+vector<GLfloat> _xRotations;
+vector<GLfloat> _yRotations;
+vector<GLfloat> _zRotations;
 
 Vector3f _cameraRotationAngle;
 Vector3f _cameraTranslation;
@@ -106,6 +114,20 @@ GLfloat _modelTranslationMatrix[16];
 
 
 GLfloat _axisesMatrix[16];
+
+void drawObjects(GLenum mode){
+	GLuint nameCounter = 1;
+
+	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
+	{
+		if (mode == GL_SELECT){
+			glLoadName(nameCounter);
+			nameCounter++;
+		}
+		SceneObject* object = *it;
+		drawObject(*object);		
+	}
+}
 
 void mydisplay()
 {
@@ -197,11 +219,7 @@ void mydisplay()
 
 	
 	//draw objects
-	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
-	{
-		SceneObject* object = *it;
-		drawObject(*object);
-	}
+	drawObjects(GL_RENDER);
 
 	glFlush(); //print to screen
 
@@ -279,6 +297,9 @@ int _lastClickedMouseButton;
 int _lastX;
 int _lastY;
 
+void mousePickingMotionCallback(int x, int y){
+
+}
 
 void mouseGlobalMotionCallback(int x, int y){
 
@@ -331,8 +352,38 @@ void mouseCameraMotionCallback(int x, int y){
 	_lastY = y;
 	glutPostRedisplay();
 }
+void list_hits(GLint hits, GLuint *names)
+{
+	int i;
 
-void mousePickingCallback(int x, int y){
+	/*
+	For each hit in the buffer are allocated 4 bytes:
+	1. Number of hits selected (always one,
+	beacuse when we draw each object
+	we use glLoadName, so we replace the
+	prevous name in the stack)
+	2. Min Z
+	3. Max Z
+	4. Name of the hit (glLoadName)
+	*/
+
+	printf("%d hits:\n", hits);
+
+	for (i = 0; i < hits; i++)
+		printf("Number: %d\n"
+		"Min Z: %d\n"
+		"Max Z: %d\n"
+		"Name on stack: %d\n",
+		(GLubyte)names[i * 4],
+		(GLubyte)names[i * 4 + 1],
+		(GLubyte)names[i * 4 + 2],
+		(GLubyte)names[i * 4 + 3]
+		);
+
+	printf("\n");
+}
+
+void mousePick(int x, int y){
 	GLint viewport[4];
 	GLuint selectionBuf[bufSize];
 
@@ -342,6 +393,12 @@ void mousePickingCallback(int x, int y){
 	// save current viewport
 	glGetIntegerv(GL_VIEWPORT, viewport); //reading viewport parameters
 
+	glMatrixMode(GL_PROJECTION);
+	glReadPixels((GLdouble)x, (GLdouble)viewport[3] - y, 2, 2, GL_DEPTH_COMPONENT, GL_FLOAT, _zValue);
+
+	glPushMatrix();	//saves current projection matrix
+	glLoadIdentity();
+
 	//init selection
 	glSelectBuffer(bufSize, selectionBuf); //declare buffer for input in selection mode
 	glRenderMode(GL_SELECT); //change to selecting mode
@@ -350,13 +407,33 @@ void mousePickingCallback(int x, int y){
 
 	// change viewport to be the square around the mouse click
 	gluPickMatrix((GLdouble)x, (GLdouble)viewport[3] - y, 1, 1, viewport); //change matrices so only the area of the picking pixel can be seen.
+	gluPerspective(_fovAngle, 1, 2, 200); //return to perspective state
 
+	glMatrixMode(GL_MODELVIEW);
+	drawObjects(GL_SELECT);
 
+	GLint hits = glRenderMode(GL_RENDER); //gets hits number 
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix(); //restores projection matrix
+
+	glMatrixMode(GL_MODELVIEW);
+	list_hits(hits, selectionBuf); //check hits
 
 }
 
 void mouse(int button, int state, int x, int y)
 {
+	if (_mode == PICKING_MODE){
+		if (state == GLUT_DOWN)
+		{
+			mousePick(x, y);
+			if (button == GLUT_RIGHT_BUTTON)
+			{
+
+			}
+		}
+	}
+
 	switch (state)
 	{
 	case GLUT_DOWN:
@@ -386,8 +463,8 @@ void keyboard(unsigned char key, int x, int y)
 		glutMotionFunc(mouseCameraMotionCallback);
 		break;
 	case 'p':
+		glutMotionFunc(mousePickingMotionCallback);
 		_mode = PICKING_MODE;
-		glutMotionFunc(mousePickingCallback);
 		break;
 	default:
 		changed = false;

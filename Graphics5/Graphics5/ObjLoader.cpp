@@ -57,6 +57,10 @@ void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 			case '\n':
 				break;
 			case 'o':
+				if (!polygons->empty()){
+					objects.push_back(new SceneObject(polygons));
+					polygons = new vector<Polygon*>();
+				}
 			case 'g':
 			case '#':
 				nextLine(file);
@@ -67,6 +71,7 @@ void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 		}
 
 	}
-	objects.push_back(new SceneObject(polygons));
-
+	if (!polygons->empty()){
+		objects.push_back(new SceneObject(polygons));
+	}
 }
