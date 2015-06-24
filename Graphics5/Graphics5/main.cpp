@@ -247,7 +247,7 @@ void initLight()
 void init()
 {
 	_mode = CAMERA_MODE;
-	ObjLoader::loadOBJ("scene.obj", sceneObjects);	//adds objects in obj file to scene objects
+	ObjLoader::loadOBJ("doll.obj", sceneObjects);	//adds objects in obj file to scene objects
 
 	glClearColor(0, 0, 0, 1);
 
