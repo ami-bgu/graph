@@ -15,24 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ObjLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Polygon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vector3f.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tirgul.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ObjLoader.cpp">
@@ -41,29 +27,43 @@
     <ClCompile Include="Polygon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SceneObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Vector3f.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Polygon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\Glaux.lib" />
+    <Library Include="lib\GLU32.LIB" />
+    <Library Include="lib\glui32.lib" />
+    <Library Include="lib\glut32.lib" />
+    <Library Include="lib\OPENGL32.LIB" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="simple.obj">
       <Filter>Resource Files</Filter>
     </Resource>
-    <Resource Include="doll.obj">
-      <Filter>Resource Files</Filter>
-    </Resource>
     <Resource Include="scene.obj">
       <Filter>Resource Files</Filter>
     </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\GLU32.LIB" />
-    <Library Include="lib\glui32.lib" />
-    <Library Include="lib\glut32.lib" />
-    <Library Include="lib\OPENGL32.LIB" />
-    <Library Include="lib\Glaux.lib" />
   </ItemGroup>
 </Project>

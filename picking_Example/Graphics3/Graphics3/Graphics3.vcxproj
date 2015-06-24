@@ -10,9 +10,43 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ObjLoader.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SceneObject.cpp" />
+    <ClCompile Include="Tirgul.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Polygon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ObjLoader.h" />
+    <ClInclude Include="Polygon.h" />
+    <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SceneObject.h" />
+    <ClInclude Include="Vector3f.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\Glaux.lib" />
+    <Library Include="lib\GLU32.LIB" />
+    <Library Include="lib\glui32.lib" />
+    <Library Include="lib\glut32.lib" />
+    <Library Include="lib\OPENGL32.LIB" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="scene.obj">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Resource>
+    <Resource Include="simple.obj">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Resource>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{19280737-C8E8-423F-BD92-21ED7F786E9A}</ProjectGuid>
-    <RootNamespace>Graphics5</RootNamespace>
+    <ProjectGuid>{23EF93A5-22A5-4F26-8DAB-8D4AC3F56C36}</ProjectGuid>
+    <RootNamespace>Graphics3</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -64,43 +98,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="ObjLoader.h" />
-    <ClInclude Include="Polygon.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="SceneObject.h" />
-    <ClInclude Include="Vector3f.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="ObjLoader.cpp" />
-    <ClCompile Include="Polygon.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="SceneObject.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="doll.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </Resource>
-    <Resource Include="simple.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\Glaux.lib" />
-    <Library Include="lib\GLU32.LIB" />
-    <Library Include="lib\glui32.lib" />
-    <Library Include="lib\glut32.lib" />
-    <Library Include="lib\OPENGL32.LIB" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="scene.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <FileType>Document</FileType>
-    </Resource>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
