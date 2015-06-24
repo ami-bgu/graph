@@ -8,11 +8,11 @@ using namespace std;
 #include "GL\glut.h"
 
 #define LINE_WIDTH 2.5
-
+#define bufSize 512
 vector<SceneObject*> sceneObjects;
 
 //GLfloat rot;
-enum Mode { CAMERA_MODE, GLOBAL_MODE };
+enum Mode { CAMERA_MODE, GLOBAL_MODE, PICKING_MODE };
 Mode _mode;
 Vector3f _globalRotationAngle;
 Vector3f _globalTranslation;
@@ -34,6 +34,8 @@ char* printModeString(){
 		return "CAMERA_MODE";
 	case GLOBAL_MODE:
 		return "GLOBAL_MODE";
+	case PICKING_MODE:
+		return "PICKING_MODE";
 	default:
 		return "UNDEFINED!";
 	}
@@ -330,6 +332,29 @@ void mouseCameraMotionCallback(int x, int y){
 	glutPostRedisplay();
 }
 
+void mousePickingCallback(int x, int y){
+	GLint viewport[4];
+	GLuint selectionBuf[bufSize];
+
+	// clear selection buffer
+	memset(selectionBuf, 0, sizeof(selectionBuf));
+
+	// save current viewport
+	glGetIntegerv(GL_VIEWPORT, viewport); //reading viewport parameters
+
+	//init selection
+	glSelectBuffer(bufSize, selectionBuf); //declare buffer for input in selection mode
+	glRenderMode(GL_SELECT); //change to selecting mode
+	glInitNames();			//initialize names stack
+	glPushName(-1);			//push name
+
+	// change viewport to be the square around the mouse click
+	gluPickMatrix((GLdouble)x, (GLdouble)viewport[3] - y, 1, 1, viewport); //change matrices so only the area of the picking pixel can be seen.
+
+
+
+}
+
 void mouse(int button, int state, int x, int y)
 {
 	switch (state)
@@ -348,19 +373,30 @@ void mouse(int button, int state, int x, int y)
 
 void keyboard(unsigned char key, int x, int y)
 {
+	bool changed = true;
 	switch (key)
 	{
-	case ' ':
-		//switch camera on pressing SPACE
-		_mode = (_mode == CAMERA_MODE) ? GLOBAL_MODE : CAMERA_MODE;
-		printf("[info] Mode Changed: %s \n", printModeString());
-		if (_mode == CAMERA_MODE)	glutMotionFunc(mouseCameraMotionCallback);
-		else						glutMotionFunc(mouseGlobalMotionCallback);
+	case 'g':
+		_mode = GLOBAL_MODE;
+		glutMotionFunc(mouseGlobalMotionCallback);
+
+		break;
+	case 'c':
+		_mode = CAMERA_MODE;
+		glutMotionFunc(mouseCameraMotionCallback);
+		break;
+	case 'p':
+		_mode = PICKING_MODE;
+		glutMotionFunc(mousePickingCallback);
 		break;
 	default:
+		changed = false;
 		break;
 	}
 	_lastClickedKey = key;
+	if (changed){
+		printf("[info] Mode Changed: %s \n", printModeString());
+	}
 }
 
 void specialKeys(int key, int x, int y)
