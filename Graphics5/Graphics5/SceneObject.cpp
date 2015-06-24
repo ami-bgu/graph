@@ -1,9 +1,11 @@
 #include "SceneObject.h"
 
 
-SceneObject::SceneObject(vector<Polygon*>* polygons)
+SceneObject::SceneObject(vector<Polygon*>* polygons, const Vector3f& centerOfMass)
 {
 	this->polygons = polygons;
+	_centerOfMass = centerOfMass;
+	printf("com is: [%.2f,%.2f,%.2f]\n", centerOfMass.x, centerOfMass.y, centerOfMass.z);
 }
 
 

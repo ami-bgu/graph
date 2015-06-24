@@ -15,6 +15,9 @@ void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 	FILE* file;
 	char c, firstChar, secondChar;
 	int i, tmpA, tmpB;
+	Vector3f centerOfMass;
+	centerOfMass.makeZero();
+	int verticesCounter = 0;
 
 	if (fopen_s(&file, path, "r") < 0){
 		printf("Error opening object file '%s'. Exiting.\n", path);
@@ -34,6 +37,8 @@ void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 				else{
 					fscanf_s(file, "%f %f %f \n", &tmpVec.x, &tmpVec.y, &tmpVec.z);
 					temp_vertices.push_back(tmpVec);
+					verticesCounter++;
+					centerOfMass += tmpVec;
 				}
 
 				break;
@@ -58,7 +63,9 @@ void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 				break;
 			case 'o':
 				if (!polygons->empty()){
-					objects.push_back(new SceneObject(polygons));
+					objects.push_back(new SceneObject(polygons, centerOfMass/verticesCounter));
+					centerOfMass.makeZero();
+					verticesCounter = 0;
 					polygons = new vector<Polygon*>();
 				}
 			case 'g':
@@ -72,6 +79,6 @@ void ObjLoader::loadOBJ(const char* path, vector<SceneObject*>& objects)
 
 	}
 	if (!polygons->empty()){
-		objects.push_back(new SceneObject(polygons));
+		objects.push_back(new SceneObject(polygons, centerOfMass / verticesCounter));
 	}
 }

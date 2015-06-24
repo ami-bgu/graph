@@ -22,6 +22,9 @@ int _lastClickedKey = 0;
 float _zValue[4];
 
 vector<GLint> _selectedObjects;
+
+vector<GLfloat> _scales;
+
 vector<GLfloat> _xTranslations;
 vector<GLfloat> _yTranslations;
 vector<GLfloat> _zTranslations;
@@ -33,7 +36,13 @@ vector<GLfloat> _zRotations;
 Vector3f _cameraRotationAngle;
 Vector3f _cameraTranslation;
 
+bool _isPicking = true;
+bool _isTPressed = false;
+bool _isRPressed = false;
+bool _isSPressed = false;
 
+
+bool _inMotion = false;
 
 char* printModeString(){
 	switch (_mode)
@@ -116,16 +125,51 @@ GLfloat _modelTranslationMatrix[16];
 GLfloat _axisesMatrix[16];
 
 void drawObjects(GLenum mode){
-	GLuint nameCounter = 1;
+	GLuint nameCounter = 0;
+	GLfloat tempModelMatrix[16];
 
+	int i = 0;
 	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
 	{
+		SceneObject* object = *it;
+
 		if (mode == GL_SELECT){
 			glLoadName(nameCounter);
 			nameCounter++;
 		}
-		SceneObject* object = *it;
-		drawObject(*object);		
+		
+		glPushMatrix();
+		//translate according to mouse
+		glGetFloatv(GL_MODELVIEW_MATRIX, tempModelMatrix);
+
+		//translate to center of mass before roatate
+		Vector3f& com = object->_centerOfMass;
+		glTranslatef(-com.x, -com.y, -com.z);
+
+		//rotate
+		//glRotatef(_zRotations[i]*180.0, 0, 0, -1);
+		//glRotatef(_xRotations[i] * 180.0, tempModelMatrix[0], tempModelMatrix[4], tempModelMatrix[8]);
+
+		glScalef(_scales[i], _scales[i], _scales[i]);
+		printf("[scaling %.2f]", _scales[i]);
+
+		//translate back
+		glTranslatef(com.x, com.y, com.z);
+		//glTranslatef(com.x, com.y, com.z);
+		//glTranslatef(com.x, com.y, com.z);
+
+
+		glTranslatef(_xTranslations[i] * tempModelMatrix[0] * 50.0, _xTranslations[i] * tempModelMatrix[4] * 50.0, _xTranslations[i] * tempModelMatrix[8] * 50.0);
+		glTranslatef(_yTranslations[i] * tempModelMatrix[1] * 50.0, _yTranslations[i] * tempModelMatrix[5] * 50.0, _yTranslations[i] * tempModelMatrix[9] * 50.0);
+		glTranslatef(_zTranslations[i] * tempModelMatrix[2] * 50.0, _zTranslations[i] * tempModelMatrix[6] * 50.0, _zTranslations[i] * tempModelMatrix[10] * 50.0);
+
+
+
+		drawObject(*object);
+
+		glPopMatrix();
+
+		i++;
 	}
 }
 
@@ -225,6 +269,15 @@ void mydisplay()
 
 }
 
+void addUnique(GLint name, vector<GLint>& vec){
+	for (int i = 0; i < vec.size(); i++){
+		if (vec[i] == name){
+			return;
+		}
+	}
+
+	vec.push_back(name);
+}
 
 void initLight()
 {
@@ -263,6 +316,19 @@ void initLight()
 
 }
 
+void initObjectsTransformations(){
+	for (int i = 0; i < sceneObjects.size(); i++){
+		_xTranslations.push_back(0);
+		_yTranslations.push_back(0);
+		_zTranslations.push_back(0);
+		
+		_xRotations.push_back(0);
+		_yRotations.push_back(0);
+		_zRotations.push_back(0);
+
+		_scales.push_back(1);
+	}
+}
 
 void init()
 {
@@ -290,6 +356,8 @@ void init()
 	glGetFloatv(GL_MODELVIEW_MATRIX, _axisesMatrix);
 
 	initLight();
+
+	initObjectsTransformations();
 }
 
 
@@ -298,11 +366,52 @@ int _lastX;
 int _lastY;
 
 void mousePickingMotionCallback(int x, int y){
+	_inMotion = true;
+	
+	int i;
+	if (!_isPicking && (_isTPressed || _isRPressed || _isSPressed)){
+		printf("moving (%d) items: \n", _selectedObjects.size());
+		for (i = 0; i < _selectedObjects.size(); i++){
+			printf("%d, ", _selectedObjects[i]);
+		}
+		//user holding left mouse button & dragging
+		int x_drag_length = x - _lastX;
+		int y_drag_length = y - _lastY;
+
+
+		for (int i = 0; i < _selectedObjects.size(); i++)
+		{
+			if (_isTPressed){
+				_xTranslations[_selectedObjects[i]] += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
+				_yTranslations[_selectedObjects[i]] -= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+			}
+
+			else if (_isRPressed){
+				_xRotations[_selectedObjects[i]] += ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT);
+				_zRotations[_selectedObjects[i]] += ((GLfloat)x_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_WIDTH);
+			}
+			else if (_isSPressed)
+			{
+				_scales[_selectedObjects[i]] *= ((GLfloat)y_drag_length) / (GLfloat)glutGet(GLUT_WINDOW_HEIGHT) +1;
+			}
+		}
+
+		_lastX = x;
+		_lastY = y;
+		glutPostRedisplay();
+
+	}
+	else{
+		printf("still picking, picked so far: (%d) items: \n", _selectedObjects.size());
+		for (i = 0; i < _selectedObjects.size(); i++){
+			printf("%d, ", _selectedObjects[i]);
+		}
+	}
+
 
 }
 
 void mouseGlobalMotionCallback(int x, int y){
-
 	int x_drag_length = x - _lastX;
 	int y_drag_length = y - _lastY;
 
@@ -325,10 +434,12 @@ void mouseGlobalMotionCallback(int x, int y){
 	_lastX = x;
 	_lastY = y;
 	glutPostRedisplay();
+
 }
 
 
 void mouseCameraMotionCallback(int x, int y){
+
 	int x_drag_length = x - _lastX;
 	int y_drag_length = y - _lastY;	//positive means draggin down
 
@@ -352,8 +463,9 @@ void mouseCameraMotionCallback(int x, int y){
 	_lastY = y;
 	glutPostRedisplay();
 }
-void list_hits(GLint hits, GLuint *names)
+GLuint list_hits(GLint hits, GLuint *names)
 {
+
 	int i;
 
 	/*
@@ -367,6 +479,7 @@ void list_hits(GLint hits, GLuint *names)
 	4. Name of the hit (glLoadName)
 	*/
 
+	/*
 	printf("%d hits:\n", hits);
 
 	for (i = 0; i < hits; i++)
@@ -381,9 +494,17 @@ void list_hits(GLint hits, GLuint *names)
 		);
 
 	printf("\n");
+	*/
+
+	/* todo : check if we can have more than 1 */
+	if (hits >= 1){
+		return names[3];
+	}
+
+	return -1;
 }
 
-void mousePick(int x, int y){
+GLuint mousePick(int x, int y){
 	GLint viewport[4];
 	GLuint selectionBuf[bufSize];
 
@@ -417,21 +538,52 @@ void mousePick(int x, int y){
 	glPopMatrix(); //restores projection matrix
 
 	glMatrixMode(GL_MODELVIEW);
-	list_hits(hits, selectionBuf); //check hits
+	return list_hits(hits, selectionBuf); //check hits
 
 }
 
 void mouse(int button, int state, int x, int y)
 {
 	if (_mode == PICKING_MODE){
-		if (state == GLUT_DOWN)
+		
+		if (state == GLUT_DOWN && (!_isTPressed || !_isRPressed || !_isSPressed))
 		{
-			mousePick(x, y);
-			if (button == GLUT_RIGHT_BUTTON)
-			{
+			GLint selectedObjectName = mousePick(x, y);
+			if (selectedObjectName != -1){
+				if (!_isPicking){
+					_selectedObjects.clear();
+				}
+				addUnique(selectedObjectName, _selectedObjects);
 
+				printf("pick update: [");
+				for (size_t i = 0; i < _selectedObjects.size(); i++)
+				{
+					printf("%d,", _selectedObjects[i]);
+				}
+				printf("]\n");
+
+
+				if (button == GLUT_RIGHT_BUTTON)
+				{
+					_isPicking = true;
+				}
+				else if (button == GLUT_LEFT_BUTTON){
+					_isPicking = false;
+				}
 			}
 		}
+		else if (state == GLUT_UP){
+			if (button == GLUT_LEFT_BUTTON){
+				if (_inMotion){
+					_selectedObjects.clear();
+					_isTPressed = false;
+					_isRPressed = false;
+					_isSPressed = false;
+				}
+			}
+		}
+
+		_inMotion = false;
 	}
 
 	switch (state)
@@ -465,6 +617,21 @@ void keyboard(unsigned char key, int x, int y)
 	case 'p':
 		glutMotionFunc(mousePickingMotionCallback);
 		_mode = PICKING_MODE;
+		break;
+	case 't':
+		_isTPressed = true;
+		changed = false;
+		printf("t pressed. preparing to translate %d items\n", _selectedObjects.size());
+		break;
+	case 'r':
+		_isRPressed = true;
+		changed = false;
+		printf("r pressed. preparing to rotate %d items\n", _selectedObjects.size());
+		break;
+	case 's':
+		_isSPressed = true;
+		changed = false;
+		printf("s pressed. preparing to scale %d items\n", _selectedObjects.size());
 		break;
 	default:
 		changed = false;
