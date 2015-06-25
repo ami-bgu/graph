@@ -127,6 +127,24 @@ GLfloat _axisesMatrix[16];
 void drawObjects(GLenum mode){
 	GLuint nameCounter = 0;
 	GLfloat tempModelMatrix[16];
+	Vector3f* com;
+
+	//bonus
+	printf("lastobject: %d", _lastObj);
+	if (_lastObj != -1){
+		//get object from name
+		for (vector<SceneObject*>::iterator it2 = sceneObjects.begin(); it2 != sceneObjects.end(); ++it2)
+		{
+			SceneObject* object2 = *it2;
+			if (object2->name == _lastObj){
+				com = &object2->_centerOfMass;
+				printf("rotating around: %d \n", object2->name);
+
+				break;
+			}
+		}
+
+	}
 
 	int i = 0;
 	for (vector<SceneObject*>::iterator it = sceneObjects.begin(); it != sceneObjects.end(); ++it)
@@ -144,24 +162,11 @@ void drawObjects(GLenum mode){
 		glGetFloatv(GL_MODELVIEW_MATRIX, tempModelMatrix);
 
 		//translate to center of mass before roatate
-		Vector3f& com = object->_centerOfMass;
-		//bonus
-		printf("lastobject: %d", _lastObj);
-		if (_lastObj != -1){
-			//get object from name
-			for (vector<SceneObject*>::iterator it2 = sceneObjects.begin(); it2 != sceneObjects.end(); ++it2)
-			{
-				SceneObject* object2 = *it2;
-				if (object2->name == _lastObj){
-					com = object2->_centerOfMass;
-					printf("rotating around: %d \n", object2->name);
-
-					break;
-				}
-			}
-
+		if (_lastObj == -1){
+			com = &object->_centerOfMass;
 		}
-		glTranslatef(com.x, com.y, com.z);
+
+		glTranslatef(com->x, com->y, com->z);
 
 		//rotate
 		glRotatef(_xRotations[i] * 180.0, tempModelMatrix[0], tempModelMatrix[4], tempModelMatrix[8]);
@@ -170,7 +175,7 @@ void drawObjects(GLenum mode){
 		glScalef(_scales[i], _scales[i], _scales[i]);
 
 		//translate back
-		glTranslatef(-com.x, -com.y, -com.z);
+		glTranslatef(-com->x, -com->y, -com->z);
 
 
 		glTranslatef(_xTranslations[i] * tempModelMatrix[0] * 50.0, _xTranslations[i] * tempModelMatrix[4] * 50.0, _xTranslations[i] * tempModelMatrix[8] * 50.0);
@@ -565,7 +570,6 @@ void mouse(int button, int state, int x, int y)
 			if (selectedObjectName != -1){
 				if (!_isPicking){
 					_selectedObjects.clear();
-					_lastObj = -1;
 				}
 				addUnique(selectedObjectName, _selectedObjects);
 
@@ -591,7 +595,6 @@ void mouse(int button, int state, int x, int y)
 			if (button == GLUT_LEFT_BUTTON){
 				if (_inMotion){
 					_selectedObjects.clear();
-					_lastObj = -1;
 					_isTPressed = false;
 					_isRPressed = false;
 					_isSPressed = false;
