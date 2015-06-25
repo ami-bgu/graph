@@ -144,26 +144,25 @@ void drawObjects(GLenum mode){
 
 		//translate to center of mass before roatate
 		Vector3f& com = object->_centerOfMass;
-		glTranslatef(-com.x, -com.y, -com.z);
+		glTranslatef(com.x, com.y, com.z);
 
 		//rotate
-		//glRotatef(_zRotations[i]*180.0, 0, 0, -1);
-		//glRotatef(_xRotations[i] * 180.0, tempModelMatrix[0], tempModelMatrix[4], tempModelMatrix[8]);
+		glRotatef(_xRotations[i] * 180.0, tempModelMatrix[0], tempModelMatrix[4], tempModelMatrix[8]);
+		glRotatef(_zRotations[i] * 180.0, tempModelMatrix[2], tempModelMatrix[6], tempModelMatrix[10]);
 
 		glScalef(_scales[i], _scales[i], _scales[i]);
-		printf("[scaling %.2f]", _scales[i]);
 
 		//translate back
-		glTranslatef(com.x, com.y, com.z);
-		//glTranslatef(com.x, com.y, com.z);
-		//glTranslatef(com.x, com.y, com.z);
+		glTranslatef(-com.x, -com.y, -com.z);
 
 
 		glTranslatef(_xTranslations[i] * tempModelMatrix[0] * 50.0, _xTranslations[i] * tempModelMatrix[4] * 50.0, _xTranslations[i] * tempModelMatrix[8] * 50.0);
 		glTranslatef(_yTranslations[i] * tempModelMatrix[1] * 50.0, _yTranslations[i] * tempModelMatrix[5] * 50.0, _yTranslations[i] * tempModelMatrix[9] * 50.0);
 		glTranslatef(_zTranslations[i] * tempModelMatrix[2] * 50.0, _zTranslations[i] * tempModelMatrix[6] * 50.0, _zTranslations[i] * tempModelMatrix[10] * 50.0);
 
-
+		com.x = com.x * _xTranslations[i] * 50.0, com.x * _xTranslations[i] * 50.0, com.x * _xTranslations[i] * 50.0;
+		com.y = com.y * _yTranslations[i] * 50.0, com.y * _yTranslations[i] * 50.0, com.y * _yTranslations[i] * 50.0;
+		com.z = com.z * _zTranslations[i] * 50.0, com.z *_zTranslations[i] * 50.0, com.z *_zTranslations[i] * 50.0;
 
 		drawObject(*object);
 
