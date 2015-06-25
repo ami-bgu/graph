@@ -3,6 +3,8 @@
 
 SceneObject::SceneObject(vector<Polygon*>* polygons, const Vector3f& centerOfMass)
 {
+	this->_rotationMatrices = new vector<GLfloat*>();
+
 	this->polygons = polygons;
 	_centerOfMass = centerOfMass;
 	printf("com is: [%.2f,%.2f,%.2f]\n", centerOfMass.x, centerOfMass.y, centerOfMass.z);

@@ -124,13 +124,30 @@ GLfloat _modelTranslationMatrix[16];
 
 GLfloat _axisesMatrix[16];
 
+SceneObject* getSceneObjectFromName(GLint name){
+	for (int i = 0; i < sceneObjects.size(); i++){
+		if (sceneObjects[i]->name == name){
+			return sceneObjects[i];
+		}
+	}
+	return 0;
+}
+
+bool isCurrentlySelected(vector<GLint>& selected, SceneObject& obj){
+	for (int i = 0; i < selected.size(); i++){
+		if (selected[i] == obj.name){
+			return true;
+		}
+	}
+
+	return false;
+}
 void drawObjects(GLenum mode){
 	GLuint nameCounter = 0;
 	GLfloat tempModelMatrix[16];
 	Vector3f* com;
 
 	//bonus
-	printf("lastobject: %d", _lastObj);
 	if (_lastObj != -1){
 		//get object from name
 		for (vector<SceneObject*>::iterator it2 = sceneObjects.begin(); it2 != sceneObjects.end(); ++it2)
@@ -166,24 +183,49 @@ void drawObjects(GLenum mode){
 			com = &object->_centerOfMass;
 		}
 
-		glTranslatef(com->x, com->y, com->z);
+		if (_lastObj != -1){
+			SceneObject* rotateOnObj = getSceneObjectFromName(_lastObj);
+			Vector3f& rotCenter = rotateOnObj->_centerOfMass;
+			GLfloat* myRotMat = (*object->_rotationMatrices)[_lastObj];
+			glLoadMatrixf(myRotMat);
+			glTranslatef(rotCenter.x, rotCenter.y, rotCenter.z);
+			//rotate
+			glRotatef(_xRotations[i] * 180.0, tempModelMatrix[0], tempModelMatrix[4], tempModelMatrix[8]);
+			glRotatef(_zRotations[i] * 180.0, tempModelMatrix[2], tempModelMatrix[6], tempModelMatrix[10]);
+			glTranslatef(-rotCenter.x, -rotCenter.y, -rotCenter.z);
+			glGetFloatv(GL_MODELVIEW_MATRIX, (*object->_rotationMatrices)[_lastObj]);
+			_xRotations[i] = 0;
+			_zRotations[i] = 0;
+		}
 
-		//rotate
-		glRotatef(_xRotations[i] * 180.0, tempModelMatrix[0], tempModelMatrix[4], tempModelMatrix[8]);
-		glRotatef(_zRotations[i] * 180.0, tempModelMatrix[2], tempModelMatrix[6], tempModelMatrix[10]);
 
 		glScalef(_scales[i], _scales[i], _scales[i]);
 
 		//translate back
-		glTranslatef(-com->x, -com->y, -com->z);
 
+		//hadnle translation
+		GLfloat* myTransMat = object->_translationMatrix;
+		glLoadMatrixf(myTransMat);
 
-		glTranslatef(_xTranslations[i] * tempModelMatrix[0] * 50.0, _xTranslations[i] * tempModelMatrix[4] * 50.0, _xTranslations[i] * tempModelMatrix[8] * 50.0);
-		glTranslatef(_yTranslations[i] * tempModelMatrix[1] * 50.0, _yTranslations[i] * tempModelMatrix[5] * 50.0, _yTranslations[i] * tempModelMatrix[9] * 50.0);
-		glTranslatef(_zTranslations[i] * tempModelMatrix[2] * 50.0, _zTranslations[i] * tempModelMatrix[6] * 50.0, _zTranslations[i] * tempModelMatrix[10] * 50.0);
+		glTranslatef(_xTranslations[i] * myTransMat[0] * 50.0, _xTranslations[i] * myTransMat[4] * 50.0, _xTranslations[i] * myTransMat[8] * 50.0);
+		glTranslatef(_yTranslations[i] * myTransMat[1] * 50.0, _yTranslations[i] * myTransMat[5] * 50.0, _yTranslations[i] * myTransMat[9] * 50.0);
+		glTranslatef(_zTranslations[i] * myTransMat[2] * 50.0, _zTranslations[i] * myTransMat[6] * 50.0, _zTranslations[i] * myTransMat[10] * 50.0);
 
- 
+		glGetFloatv(GL_MODELVIEW_MATRIX, object->_translationMatrix);
+		//
+
+		glLoadMatrixf(tempModelMatrix);
+		glMultMatrixf(object->_translationMatrix);
+
+		for (int m = 0; m < sceneObjects.size(); m++){
+			glMultMatrixf((*object->_rotationMatrices)[m]);
+		}
+
 		drawObject(*object);
+
+		_xTranslations[i] = 0;
+		_yTranslations[i] = 0;
+		_zTranslations[i] = 0;
 
 		glPopMatrix();
 
@@ -353,7 +395,24 @@ void init()
 	_mode = CAMERA_MODE;
 	ObjLoader::loadOBJ("scene.obj", sceneObjects);	//adds objects in obj file to scene objects
 
+
 	glClearColor(0, 0, 0, 1);
+
+	//init objects matrices
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	int sz = sceneObjects.size();
+	
+	for (int i = 0; i < sz; i++){
+		for (int j = 0; j < sz; j++){
+			GLfloat* tmpRotMat = new GLfloat[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, tmpRotMat);
+			sceneObjects[i]->_rotationMatrices->push_back(tmpRotMat);
+		}
+		glGetFloatv(GL_MODELVIEW_MATRIX, sceneObjects[i]->_translationMatrix);
+	}
+	//end init objects matrices
 
 	glMatrixMode(GL_PROJECTION); /* switch matrix mode */
 	glLoadIdentity();		//load Identity matrix
@@ -385,7 +444,7 @@ int _lastY;
 
 void mousePickingMotionCallback(int x, int y){
 	_inMotion = true;
-	
+	printf("motion func called!!!\n");
 	int i;
 	if (!_isPicking && (_isTPressed || _isRPressed || _isSPressed)){
 		printf("moving (%d) items: \n", _selectedObjects.size());
@@ -636,6 +695,9 @@ void keyboard(unsigned char key, int x, int y)
 	case 'p':
 		glutMotionFunc(mousePickingMotionCallback);
 		_mode = PICKING_MODE;
+		_isTPressed = false;
+		_isRPressed = false;
+		_isSPressed = false;
 		break;
 	case 't':
 		_isTPressed = true;
