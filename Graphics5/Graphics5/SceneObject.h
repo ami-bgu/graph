@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Polygon.h"
+#include "GL\glut.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ public:
 	~SceneObject();
 
 	vector<Polygon*>* polygons;
-
+	GLint name;
 	Vector3f _centerOfMass;
 };
 
