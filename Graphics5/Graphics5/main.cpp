@@ -237,6 +237,9 @@ void mydisplay()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glAccum(GL_RETURN, 0.95f);
+	glClear(GL_ACCUM_BUFFER_BIT);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(_fovAngle, 1, 2, 200);
@@ -324,6 +327,9 @@ void mydisplay()
 	
 	//draw objects
 	drawObjects(GL_RENDER);
+
+	glutSwapBuffers();
+	glAccum(GL_ACCUM, 0.9f);
 
 	glFlush(); //print to screen
 
